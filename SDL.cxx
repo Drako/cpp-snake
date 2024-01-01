@@ -7,8 +7,7 @@ SDLError::SDLError(std::string_view const context, std::source_location location
     :std::runtime_error{(std::ostringstream{}
     << context << " at "
     << location.file_name() << ":" << location.line() << ":" << location.column()
-    << " - " << SDL_GetError()
-                        ).str()}
+    << " - " << SDL_GetError()).str()}
 {
 }
 
