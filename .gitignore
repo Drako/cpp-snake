@@ -1,0 +1,9 @@
+# CLion
+.idea/*
+!.idea/codeStyles/
+
+# CMake
+cmake*/
+
+# MacOS
+.DS_Store
