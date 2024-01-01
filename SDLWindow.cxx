@@ -7,7 +7,7 @@ SDLWindow::SDLWindow(std::string_view title, int x, int y, int w, int h, std::ui
   SDL::require(SDL_INIT_VIDEO);
   window_ = SDL_CreateWindow(title.data(), x, y, w, h, flags);
   if (window_==nullptr) {
-    throw SDLError("Failed to create window");
+    throw SDLError("Failed to create window.");
   }
   SDL_Log("Created window successfully.");
 }

@@ -2,6 +2,7 @@
 #include "SDLWindow.hxx"
 #include "SDLRenderer.hxx"
 
+#include "game/AssetManager.hxx"
 #include "game/GameStateManager.hxx"
 
 #include <cstdlib>
@@ -10,7 +11,8 @@ void main_loop(SDLRenderer& renderer)
 {
   using namespace std::chrono;
 
-  GameStateManager gsm;
+  AssetManager am{renderer};
+  GameStateManager gsm{};
 
   auto start = high_resolution_clock::now();
   for (;;) {

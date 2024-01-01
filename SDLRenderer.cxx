@@ -4,7 +4,7 @@ SDLRenderer::SDLRenderer(SDLWindow& window)
 {
   renderer_ = SDL_CreateRenderer(window, 0, SDL_RENDERER_ACCELERATED);
   if (renderer_==nullptr) {
-    throw SDLError("Failed to create renderer");
+    throw SDLError("Failed to create renderer.");
   }
   SDL_RenderSetVSync(renderer_, SDL_TRUE);
   SDL_Log("Created renderer successfully.");

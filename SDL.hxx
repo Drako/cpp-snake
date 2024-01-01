@@ -21,7 +21,7 @@
 class SDLError final : public std::runtime_error {
 public:
   explicit SDLError(
-      std::string_view context,
+      std::string_view message,
       std::source_location location = std::source_location::current()
   );
 };
