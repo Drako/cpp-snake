@@ -6,7 +6,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(FetchContent)
-
 FetchContent_Declare(
     SDL2
     GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
@@ -27,7 +26,9 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(SDL2 SDL2_image SDL2_ttf)
 
-add_executable(Snake WIN32 main.cxx)
+add_executable(Snake WIN32 main.cxx
+    SDL.cxx
+    SDL.hxx)
 
 target_link_libraries(Snake PRIVATE
     SDL2::SDL2 SDL2::SDL2main
