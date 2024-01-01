@@ -37,3 +37,11 @@ SDL& SDL::instance() noexcept
   assert(instance_!=nullptr);
   return *instance_;
 }
+
+SDL& SDL::require(std::uint32_t const flags) noexcept
+{
+  assert((SDL_WasInit(flags) | SDL_INIT_NOPARACHUTE)==(flags | SDL_INIT_NOPARACHUTE));
+  return instance();
+}
+
+

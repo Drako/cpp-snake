@@ -26,9 +26,11 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(SDL2 SDL2_image SDL2_ttf)
 
-add_executable(Snake WIN32 main.cxx
-    SDL.cxx
-    SDL.hxx)
+add_executable(Snake WIN32
+    main.cxx
+    SDL.cxx SDL.hxx
+    SDLWindow.cxx SDLWindow.hxx
+)
 
 target_link_libraries(Snake PRIVATE
     SDL2::SDL2 SDL2::SDL2main

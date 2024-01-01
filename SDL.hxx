@@ -45,6 +45,8 @@ public:
 
   static SDL& instance() noexcept;
 
+  static SDL& require(std::uint32_t flags) noexcept;
+
 private:
   static SDL* instance_;
 };
