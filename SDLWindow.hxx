@@ -11,7 +11,7 @@ class SDLWindow final {
 public:
   SDLWindow(std::string_view title, int x, int y, int w, int h, std::uint32_t flags = 0u);
 
-  ~SDLWindow();
+  ~SDLWindow() noexcept;
 
   SDLWindow(SDLWindow const&) = delete;
 

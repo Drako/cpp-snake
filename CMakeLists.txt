@@ -30,6 +30,10 @@ add_executable(Snake WIN32
     main.cxx
     SDL.cxx SDL.hxx
     SDLWindow.cxx SDLWindow.hxx
+    SDLRenderer.cxx SDLRenderer.hxx
+    game/GameState.hxx
+    game/GameStateManager.cxx game/GameStateManager.hxx
+    game/LoadingState.cxx game/LoadingState.hxx
 )
 
 target_link_libraries(Snake PRIVATE

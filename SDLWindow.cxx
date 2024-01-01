@@ -12,7 +12,7 @@ SDLWindow::SDLWindow(std::string_view title, int x, int y, int w, int h, std::ui
   SDL_Log("Created window successfully.");
 }
 
-SDLWindow::~SDLWindow()
+SDLWindow::~SDLWindow() noexcept
 {
   destroy();
 }
