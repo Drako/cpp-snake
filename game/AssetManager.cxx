@@ -17,15 +17,15 @@ AssetManager::AssetManager(SDLRenderer& renderer)
 
   auto current_path = fs::current_path();
   auto const asset_directory =
-      fs::exists(current_path / "assets") ? current_path / "assets" :
-      fs::exists(current_path.parent_path() / "assets") ? current_path.parent_path() / "assets" :
+      fs::exists(current_path/"assets") ? current_path/"assets" :
+      fs::exists(current_path.parent_path()/"assets") ? current_path.parent_path()/"assets" :
       fs::path{};
   if (asset_directory.empty()) {
     throw std::runtime_error("Assets directory not found.");
   }
 
   total_assets_ = std::distance(fs::directory_iterator(asset_directory),
-                                fs::directory_iterator());
+      fs::directory_iterator());
 
   loading_thread_ = std::thread{&AssetManager::load_assets, this, asset_directory};
   instance_ = this;
@@ -57,7 +57,7 @@ void AssetManager::load_assets(std::filesystem::path const& asset_directory)
       SDL_Surface* temp_surface = IMG_Load(path.c_str());
       auto const texture = SDL_CreateTextureFromSurface(renderer_, temp_surface);
       SDL_FreeSurface(temp_surface);
-      if (texture == nullptr) {
+      if (texture==nullptr) {
         throw SDLError{std::format("Failed to load texture {}.", path)};
       }
       texture_assets_[path] = texture;
@@ -65,7 +65,7 @@ void AssetManager::load_assets(std::filesystem::path const& asset_directory)
     }
     else if (ext==".ttf") {
       auto const font = TTF_OpenFont(path.c_str(), 16);
-      if (font == nullptr) {
+      if (font==nullptr) {
         throw SDLError{std::format("Failed to load font {}.", path)};
       }
       font_assets_[path] = font;
