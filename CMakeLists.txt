@@ -37,6 +37,7 @@ add_executable(Snake WIN32
     game/SplashState.cxx game/SplashState.hxx
     game/DummyState.cxx game/DummyState.hxx
     game/AssetManager.cxx game/AssetManager.hxx
+    game/ui/Button.cxx game/ui/Button.hxx
 )
 
 target_link_libraries(Snake PRIVATE
