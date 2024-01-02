@@ -6,7 +6,7 @@
 void DummyState::update(GameStateManager& gsm, std::chrono::milliseconds delta_time)
 {
   time_in_state_ += delta_time;
-  quit_button_.set_on_click([&gsm] mutable{
+  quit_button_.set_on_click([&gsm] {
     gsm.pop_state();
   });
   quit_button_.update();

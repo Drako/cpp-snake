@@ -133,7 +133,7 @@ Button::Button(std::string title, int x, int y, int w, int h)
     return AssetManager::instance().get_texture_asset("blue_button_down.png");
   });
   font_ = std::async(std::launch::deferred, [] {
-    return AssetManager::instance().get_font_asset("kenvector_future.ttf");
+    return AssetManager::instance().get_font_asset("kenney_pixel.ttf");
   });
 }
 
