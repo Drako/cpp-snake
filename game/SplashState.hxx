@@ -7,8 +7,7 @@
 
 #include <SDL.h>
 
-class SplashState final : public GameState
-{
+class SplashState final : public GameState {
 public:
   void on_enter() override;
 
