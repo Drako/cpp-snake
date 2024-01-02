@@ -41,6 +41,10 @@
       <option name="TAG_PREFIX_OF_LINE_COMMENT" value="AT" />
       <option name="TYPE_QUALIFIERS_PLACEMENT" value="AFTER" />
     </Objective-C-extensions>
+    <RiderCodeStyleSettings>
+      <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/INDENT_SIZE/@EntryValue" value="2" type="long" />
+      <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/TAB_WIDTH/@EntryValue" value="2" type="long" />
+    </RiderCodeStyleSettings>
     <files>
       <extensions>
         <pair source="cpp" header="hpp" fileNamingConvention="NONE" />

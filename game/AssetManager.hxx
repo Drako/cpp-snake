@@ -27,7 +27,7 @@ public:
 
   float get_progress() const;
 
-  SDL_Surface* get_image_asset(std::string const& filepath);
+  SDL_Texture* get_texture_asset(std::string const& filepath);
 
   TTF_Font* get_font_asset(std::string const& filepath);
 
@@ -42,7 +42,8 @@ private:
 
   SDLRenderer& renderer_;
 
-  std::unordered_map<std::string, SDL_Surface*> image_assets_;
+  std::unordered_map<std::string, SDL_Surface*> surface_assets_;
+  std::unordered_map<std::string, SDL_Texture*> texture_assets_;
   std::unordered_map<std::string, TTF_Font*> font_assets_;
 };
 

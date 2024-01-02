@@ -7,19 +7,18 @@
 
 #include <SDL.h>
 
-class SplashState final : public GameState {
+class SplashState final : public GameState
+{
 public:
   void on_enter() override;
-
-  void on_leave() override;
 
   void update(GameStateManager& gsm, std::chrono::milliseconds delta_time) override;
 
   void render(SDLRenderer& renderer) override;
 
 private:
-  std::chrono::milliseconds time_in_state_;
-  SDL_Texture* logo_;
+  std::chrono::milliseconds time_in_state_{0};
+  SDL_Texture* logo_{nullptr};
 };
 
 #endif // SNAKE_SPLASHSTATE_HXX
