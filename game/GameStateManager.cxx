@@ -20,7 +20,7 @@ GameState* GameStateManager::current()
 
   switch (states_.top()) {
   default:
-    return nullptr; // TODO: handle all game states
+    return &dummy_; // TODO: handle all game states
   case GameStates::Loading:
     return &loading_;
   case GameStates::Splash:

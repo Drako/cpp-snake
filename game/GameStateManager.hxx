@@ -5,6 +5,7 @@
 
 #include "LoadingState.hxx"
 #include "SplashState.hxx"
+#include "DummyState.hxx"
 
 #include <stack>
 
@@ -35,6 +36,7 @@ private:
 
   LoadingState loading_;
   SplashState splash_;
+  DummyState dummy_;
 };
 
 #endif // SNAKE_GAMESTATEMANAGER_HXX

@@ -35,6 +35,7 @@ add_executable(Snake WIN32
     game/GameStateManager.cxx game/GameStateManager.hxx
     game/LoadingState.cxx game/LoadingState.hxx
     game/SplashState.cxx game/SplashState.hxx
+    game/DummyState.cxx game/DummyState.hxx
     game/AssetManager.cxx game/AssetManager.hxx
 )
 
