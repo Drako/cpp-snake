@@ -343,3 +343,20 @@ void Button::set_on_click(std::function<void()> handler)
 {
   on_click_ = std::move(handler);
 }
+
+void Button::move(int const x, int const y)
+{
+  x_ = x;
+  y_ = y;
+}
+
+void Button::resize(int const w, int const h)
+{
+  w_ = w;
+  h_ = h;
+}
+
+SDL_Rect Button::get_bounding_box() const
+{
+  return {x_, y_, w_, h_};
+}

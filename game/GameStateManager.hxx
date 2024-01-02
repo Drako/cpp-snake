@@ -5,6 +5,7 @@
 
 #include "LoadingState.hxx"
 #include "SplashState.hxx"
+#include "MenuState.hxx"
 #include "DummyState.hxx"
 
 #include <stack>
@@ -29,6 +30,8 @@ public:
 
   GameState* current();
 
+  GameState* parent();
+
   void push_state(GameStates new_state);
 
   void pop_state();
@@ -38,8 +41,11 @@ public:
 private:
   std::stack<GameStates> states_;
 
+  GameState* enum_to_state(GameStates state);
+
   LoadingState loading_;
   SplashState splash_;
+  MenuState menu_;
   DummyState dummy_;
 };
 

@@ -28,6 +28,12 @@ public:
 
   void set_on_click(std::function<void()> handler);
 
+  void move(int x, int y);
+
+  void resize(int w, int h);
+
+  SDL_Rect get_bounding_box() const;
+
 private:
   std::string title_;
   int x_, y_, w_, h_;

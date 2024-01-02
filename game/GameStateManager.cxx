@@ -13,19 +13,39 @@ GameStateManager::~GameStateManager()
   }
 }
 
-GameState* GameStateManager::current()
+GameState* GameStateManager::enum_to_state(GameStates const state)
 {
-  if (states_.empty())
-    return nullptr;
-
-  switch (states_.top()) {
+  switch (state) {
   default:
     return &dummy_; // TODO: handle all game states
   case GameStates::Loading:
     return &loading_;
   case GameStates::Splash:
     return &splash_;
+  case GameStates::MainMenu:
+    return &menu_;
   }
+}
+
+GameState* GameStateManager::current()
+{
+  if (states_.empty())
+    return nullptr;
+
+  return enum_to_state(states_.top());
+}
+
+GameState* GameStateManager::parent()
+{
+  if (states_.size()<2)
+    return nullptr;
+
+  auto const current = states_.top();
+  states_.pop();
+  auto const parent = states_.top();
+  states_.push(current);
+
+  return enum_to_state(parent);
 }
 
 void GameStateManager::push_state(GameStates const new_state)
