@@ -14,7 +14,7 @@ public:
 
 private:
   std::chrono::milliseconds time_in_state_{0};
-  Button test_button_{"Test", 15, 15, 300, 80};
+  Button quit_button_{"Test", 15, 15, 300, 80};
 };
 
 #endif // SNAKE_DUMMYSTATE_HXX

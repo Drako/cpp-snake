@@ -124,6 +124,8 @@ Button::Button(std::string title, int x, int y, int w, int h)
   assert(w_>=12);
   assert(h_>=14);
 
+  on_click_ = [] { };
+
   up_ = std::async(std::launch::deferred, [] {
     return AssetManager::instance().get_texture_asset("blue_button_up.png");
   });
@@ -309,4 +311,35 @@ void Button::render(SDLRenderer& renderer)
   }
 
   SDL_DestroyTexture(text_ure);
+}
+
+void Button::update()
+{
+  int mouse_x, mouse_y;
+  auto const mouse_button = SDL_GetMouseState(&mouse_x, &mouse_y);
+
+  if ((mouse_x>=x_ && mouse_x<=(x_+w_) && mouse_y>=y_ && mouse_y<=(y_+h_))) {
+    if (mouse_button & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+      pressed_ = true;
+    }
+    else {
+      if (pressed_) {
+        trigger();
+      }
+      pressed_ = false;
+    }
+  }
+  else {
+    pressed_ = false;
+  }
+}
+
+void Button::trigger()
+{
+  on_click_();
+}
+
+void Button::set_on_click(std::function<void()> handler)
+{
+  on_click_ = std::move(handler);
 }

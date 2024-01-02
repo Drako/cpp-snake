@@ -6,6 +6,7 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 
+#include <functional>
 #include <future>
 #include <string>
 
@@ -19,12 +20,19 @@ public:
 
   bool is_pressed() const;
 
+  void update();
+
   void render(SDLRenderer& renderer);
+
+  void trigger();
+
+  void set_on_click(std::function<void()> handler);
 
 private:
   std::string title_;
   int x_, y_, w_, h_;
   bool pressed_;
+  std::function<void()> on_click_;
 
   std::shared_future<SDL_Texture*> up_;
   std::shared_future<SDL_Texture*> down_;

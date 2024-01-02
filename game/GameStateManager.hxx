@@ -23,6 +23,10 @@ public:
 
   ~GameStateManager();
 
+  GameStateManager(GameStateManager const&) = delete;
+
+  GameStateManager& operator=(GameStateManager) = delete;
+
   GameState* current();
 
   void push_state(GameStates new_state);
