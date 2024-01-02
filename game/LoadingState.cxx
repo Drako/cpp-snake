@@ -1,10 +1,13 @@
 #include "LoadingState.hxx"
 #include "AssetManager.hxx"
+#include "GameStateManager.hxx"
 
 void LoadingState::update(GameStateManager& gsm, std::chrono::milliseconds const delta_time)
 {
-  (void) gsm;
   (void) delta_time;
+  if (AssetManager::instance().get_progress()==1.0f) {
+    gsm.replace_state(GameStates::Splash);
+  }
 }
 
 void LoadingState::render(SDLRenderer& renderer)

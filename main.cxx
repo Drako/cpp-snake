@@ -28,6 +28,7 @@ void main_loop(SDLRenderer& renderer)
 
     auto const end = high_resolution_clock::now();
     auto const delta_time = duration_cast<milliseconds>(end-start);
+    start = end;
 
     state->update(gsm, delta_time);
     state->render(renderer);

@@ -34,8 +34,8 @@ add_executable(Snake WIN32
     game/GameState.hxx
     game/GameStateManager.cxx game/GameStateManager.hxx
     game/LoadingState.cxx game/LoadingState.hxx
-    game/AssetManager.cxx
-    game/AssetManager.hxx
+    game/SplashState.cxx game/SplashState.hxx
+    game/AssetManager.cxx game/AssetManager.hxx
 )
 
 target_link_libraries(Snake PRIVATE

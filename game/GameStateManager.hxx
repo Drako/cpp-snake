@@ -4,6 +4,7 @@
 #define SNAKE_GAMESTATEMANAGER_HXX
 
 #include "LoadingState.hxx"
+#include "SplashState.hxx"
 
 #include <stack>
 
@@ -33,6 +34,7 @@ private:
   std::stack<GameStates> states_;
 
   LoadingState loading_;
+  SplashState splash_;
 };
 
 #endif // SNAKE_GAMESTATEMANAGER_HXX

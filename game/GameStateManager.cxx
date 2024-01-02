@@ -23,6 +23,8 @@ GameState* GameStateManager::current()
     return nullptr; // TODO: handle all game states
   case GameStates::Loading:
     return &loading_;
+  case GameStates::Splash:
+    return &splash_;
   }
 }
 

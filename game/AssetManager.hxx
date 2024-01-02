@@ -4,12 +4,13 @@
 #define SNAKE_ASSETMANAGER_HXX
 
 #include "../SDLRenderer.hxx"
-#include <SDL_ttf.h>
 
 #include <atomic>
 #include <filesystem>
 #include <thread>
 #include <unordered_map>
+
+#include <SDL_ttf.h>
 
 class AssetManager final {
 
@@ -26,7 +27,7 @@ public:
 
   float get_progress() const;
 
-  SDL_Texture* get_texture_asset(std::string const& filepath);
+  SDL_Surface* get_image_asset(std::string const& filepath);
 
   TTF_Font* get_font_asset(std::string const& filepath);
 
@@ -41,7 +42,7 @@ private:
 
   SDLRenderer& renderer_;
 
-  std::unordered_map<std::string, SDL_Texture*> texture_assets_;
+  std::unordered_map<std::string, SDL_Surface*> image_assets_;
   std::unordered_map<std::string, TTF_Font*> font_assets_;
 };
 

@@ -37,8 +37,8 @@ AssetManager::~AssetManager()
   if (loading_thread_.joinable()) {
     loading_thread_.join();
   }
-  for (auto& kv: texture_assets_) {
-    SDL_DestroyTexture(kv.second);
+  for (auto& kv: image_assets_) {
+    SDL_FreeSurface(kv.second);
     SDL_Log("Unloaded texture %s successfully.", kv.first.c_str());
   }
   for (auto& kv: font_assets_) {
@@ -53,23 +53,22 @@ void AssetManager::load_assets(std::filesystem::path const& asset_directory)
   for (auto const& entry: std::filesystem::directory_iterator(asset_directory)) {
     auto const path = entry.path().string();
     auto const ext = entry.path().extension();
+    auto const filename = entry.path().filename().string();
     if (ext==".png" || ext==".jpg") {
-      SDL_Surface* temp_surface = IMG_Load(path.c_str());
-      auto const texture = SDL_CreateTextureFromSurface(renderer_, temp_surface);
-      SDL_FreeSurface(temp_surface);
-      if (texture==nullptr) {
+      auto const surface = IMG_Load(path.c_str());
+      if (surface==nullptr) {
         throw SDLError{std::format("Failed to load texture {}.", path)};
       }
-      texture_assets_[path] = texture;
-      SDL_Log("Loaded texture %s successfully.", path.c_str());
+      image_assets_[filename] = surface;
+      SDL_Log("Loaded texture %s successfully.", filename.c_str());
     }
     else if (ext==".ttf") {
       auto const font = TTF_OpenFont(path.c_str(), 16);
       if (font==nullptr) {
         throw SDLError{std::format("Failed to load font {}.", path)};
       }
-      font_assets_[path] = font;
-      SDL_Log("Loaded font %s successfully.", path.c_str());
+      font_assets_[filename] = font;
+      SDL_Log("Loaded font %s successfully.", filename.c_str());
     }
     ++assets_loaded_;
   }
@@ -80,9 +79,9 @@ float AssetManager::get_progress() const
   return static_cast<float>(assets_loaded_)/static_cast<float>(total_assets_);
 }
 
-SDL_Texture* AssetManager::get_texture_asset(std::string const& filepath)
+SDL_Surface* AssetManager::get_image_asset(std::string const& filepath)
 {
-  return texture_assets_[filepath];
+  return image_assets_[filepath];
 }
 
 TTF_Font* AssetManager::get_font_asset(std::string const& filepath)
