@@ -21,6 +21,10 @@ public:
 
   [[nodiscard]] bool is_pressed() const;
 
+  void set_visible(bool visible);
+
+  [[nodiscard]] bool is_visible() const;
+
   void update();
 
   void render(SDLRenderer& renderer);
@@ -39,6 +43,7 @@ private:
   std::string title_;
   int x_, y_, w_, h_;
   bool pressed_;
+  bool visible_;
   std::function<void()> on_click_;
 
   Asset<SDL_Texture*> up_;

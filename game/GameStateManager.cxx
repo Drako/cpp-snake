@@ -3,7 +3,7 @@
 GameStateManager::GameStateManager()
     :states_{{GameStates::Loading}}
 {
-  loading_.on_enter();
+  loading_.on_enter(*this);
 }
 
 GameStateManager::~GameStateManager()
@@ -51,7 +51,7 @@ GameState* GameStateManager::parent()
 void GameStateManager::push_state(GameStates const new_state)
 {
   states_.push(new_state);
-  current()->on_enter();
+  current()->on_enter(*this);
 }
 
 void GameStateManager::pop_state()

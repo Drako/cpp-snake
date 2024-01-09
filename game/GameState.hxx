@@ -13,7 +13,7 @@ class GameState {
 public:
   virtual ~GameState() noexcept = default;
 
-  virtual void on_enter() { }
+  virtual void on_enter(GameStateManager& gsm) { (void) gsm; }
 
   virtual void on_leave() { }
 

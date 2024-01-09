@@ -9,7 +9,7 @@
 
 class SplashState final : public GameState {
 public:
-  void on_enter() override;
+  void on_enter(GameStateManager& gsm) override;
 
   void update(GameStateManager& gsm, std::chrono::milliseconds delta_time) override;
 

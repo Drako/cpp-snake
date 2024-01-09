@@ -62,8 +62,9 @@ void SplashState::render(SDLRenderer& renderer)
   SDL_RenderPresent(renderer);
 }
 
-void SplashState::on_enter()
+void SplashState::on_enter(GameStateManager& gsm)
 {
+  (void) gsm;
   time_in_state_ = 0ms;
   logo_ = AssetManager::instance().get_texture_asset("logo.jpg");
   SDL_SetTextureBlendMode(logo_, SDL_BLENDMODE_BLEND);

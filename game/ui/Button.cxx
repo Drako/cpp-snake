@@ -58,6 +58,7 @@ namespace {
 
 Button::Button(std::string title, int x, int y, int w, int h)
     :title_{std::move(title)}, x_{x}, y_{y}, w_{w}, h_{h}, pressed_{false},
+     visible_{true},
      up_{"blue_button_up.png"},
      down_{"blue_button_down.png"},
      font_{"kenney_pixel.ttf"}
@@ -80,6 +81,9 @@ bool Button::is_pressed() const
 
 void Button::render(SDLRenderer& renderer)
 {
+  if (!visible_)
+    return;
+
   auto const text = TTF_RenderUTF8_Solid(font_, title_.c_str(), {0, 0, 0, SDL_ALPHA_OPAQUE});
   auto const text_ure = SDL_CreateTextureFromSurface(renderer, text);
   SDL_FreeSurface(text);
@@ -127,6 +131,9 @@ void Button::render(SDLRenderer& renderer)
 
 void Button::update()
 {
+  if (!visible_)
+    return;
+
   int mouse_x, mouse_y;
   auto const mouse_button = SDL_GetMouseState(&mouse_x, &mouse_y);
 
@@ -171,4 +178,14 @@ void Button::resize(int const w, int const h)
 SDL_Rect Button::get_bounding_box() const
 {
   return {x_, y_, w_, h_};
+}
+
+void Button::set_visible(bool const visible)
+{
+  visible_ = visible;
+}
+
+bool Button::is_visible() const
+{
+  return visible_;
 }
