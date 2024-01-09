@@ -6,8 +6,8 @@
 #include "../SDLRenderer.hxx"
 
 #include <atomic>
+#include <concepts>
 #include <filesystem>
-#include <optional>
 #include <thread>
 #include <unordered_map>
 
@@ -47,6 +47,9 @@ private:
 };
 
 template<typename T>
+concept Pointer = std::is_pointer_v<T>;
+
+template<Pointer T>
 struct AssetTraits;
 
 template<>
@@ -75,7 +78,8 @@ class Asset final {
 
 public:
   explicit Asset(std::string name)
-      :name_{std::move(name)}
+      :name_{std::move(name)},
+       asset_{nullptr}
   {
   }
 
@@ -83,26 +87,28 @@ public:
 
   Asset& operator=(Asset const&) = default;
 
-  operator T& () { // NOLINT(*-explicit-constructor)
+  operator T&() // NOLINT(*-explicit-constructor)
+  {
     evaluate();
-    return asset_.value();
+    return asset_;
   }
 
-  operator T const& () const { // NOLINT(*-explicit-constructor)
+  operator T const&() const // NOLINT(*-explicit-constructor)
+  {
     evaluate();
-    return asset_.value();
+    return asset_;
   }
 
 private:
   void evaluate() const
   {
-    if (!asset_.has_value()) {
+    if (asset_==nullptr) {
       asset_ = traits::get(name_);
     }
   }
 
   std::string name_;
-  mutable std::optional<T> asset_;
+  mutable T asset_;
 };
 
 #endif // SNAKE_ASSETMANAGER_HXX
