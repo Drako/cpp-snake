@@ -5,6 +5,7 @@
 
 #include "GameState.hxx"
 #include "ui/Button.hxx"
+#include "ui/LineInput.hxx"
 
 class DummyState final : public GameState {
 public:
@@ -16,6 +17,7 @@ public:
 
 private:
   Button pause_button_{"Pause", 15, 15, 800, 80};
+  LineInput name_input_{15, 200, 800, 80, "Felix"};
 };
 
 #endif // SNAKE_DUMMYSTATE_HXX

@@ -18,7 +18,7 @@ private:
   static int constexpr BUTTON_HEIGHT = 80;
   static int constexpr BUTTON_WIDTH = 300;
 
-  Button new_game_button_{"New game", 0, 0, BUTTON_WIDTH, BUTTON_HEIGHT};
+  Button new_game_button_{"New game", 0, 0, BUTTON_WIDTH, BUTTON_HEIGHT, UiColor::Green};
   Button continue_button_{"Continue", 0, 0, BUTTON_WIDTH, BUTTON_HEIGHT};
   Button quit_button_{"Quit", 0, 0, BUTTON_WIDTH, BUTTON_HEIGHT};
   bool escape_pressed_{false};

@@ -68,7 +68,7 @@ void AssetManager::load_assets(std::filesystem::path const& asset_directory)
       SDL_Log("Loaded texture %s successfully.", filename.c_str());
     }
     else if (ext==".ttf") {
-      auto const font = TTF_OpenFont(path.c_str(), 16);
+      auto const font = TTF_OpenFont(path.c_str(), 42);
       if (font==nullptr) {
         throw SDLError{std::format("Failed to load font {}.", path)};
       }

@@ -9,13 +9,17 @@
 #include <functional>
 #include <string>
 
+#include <boost/noncopyable.hpp>
+
+#include "UiColor.hxx"
 #include "../AssetManager.hxx"
 
-class SDLRenderer;
-
-class Button final {
+class Button final : private boost::noncopyable {
 public:
-  Button(std::string title, int x, int y, int w, int h);
+  static int constexpr MIN_WIDTH = 12;
+  static int constexpr MIN_HEIGHT = 14;
+
+  Button(std::string title, int x, int y, int w, int h, UiColor color = UiColor::Grey);
 
   void set_pressed(bool pressed);
 

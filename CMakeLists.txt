@@ -45,6 +45,8 @@ add_executable(Snake WIN32
     game/DummyState.cxx game/DummyState.hxx
     game/AssetManager.cxx game/AssetManager.hxx
     game/ui/Button.cxx game/ui/Button.hxx
+    game/ui/LineInput.cxx game/ui/LineInput.hxx
+    game/ui/UiColor.hxx game/ui/UiColor.cxx
 )
 
 target_link_libraries(Snake PRIVATE

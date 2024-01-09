@@ -56,15 +56,15 @@ namespace {
   }
 }
 
-Button::Button(std::string title, int x, int y, int w, int h)
+Button::Button(std::string title, int const x, int const y, int const w, int const h, UiColor const color)
     :title_{std::move(title)}, x_{x}, y_{y}, w_{w}, h_{h}, pressed_{false},
      visible_{true},
-     up_{"blue_button_up.png"},
-     down_{"blue_button_down.png"},
+     up_{ui_image("button_up", color)},
+     down_{ui_image("button_down", color)},
      font_{"kenney_pixel.ttf"}
 {
-  assert(w_>=12);
-  assert(h_>=14);
+  assert(w_>=MIN_WIDTH);
+  assert(h_>=MIN_HEIGHT);
 
   on_click_ = [] { };
 }
@@ -171,6 +171,9 @@ void Button::move(int const x, int const y)
 
 void Button::resize(int const w, int const h)
 {
+  assert(w>=MIN_WIDTH);
+  assert(h>=MIN_HEIGHT);
+
   w_ = w;
   h_ = h;
 }
