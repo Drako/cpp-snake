@@ -10,6 +10,8 @@
 #include <stdexcept>
 #include <string_view>
 
+#include <boost/noncopyable.hpp>
+
 /**
  * @class SDLError
  * @brief Represents an SDL error.
@@ -33,15 +35,11 @@ public:
  * This class provides a convenient way to initialize SDL and clean up resources when they are no longer needed.
  * Only one instance of this class can exist at a time.
  */
-class SDL final {
+class SDL final : private boost::noncopyable {
 public:
   explicit SDL(std::uint32_t flags = SDL_INIT_EVERYTHING);
 
   ~SDL() noexcept;
-
-  SDL(SDL const&) = delete;
-
-  SDL& operator=(SDL const&) = delete;
 
   static SDL& instance() noexcept;
 

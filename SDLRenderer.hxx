@@ -5,15 +5,13 @@
 
 #include "SDLWindow.hxx"
 
-class SDLRenderer final {
+#include <boost/noncopyable.hpp>
+
+class SDLRenderer final : private boost::noncopyable {
 public:
-  SDLRenderer(SDLWindow& window);
+  explicit SDLRenderer(SDLWindow& window);
 
   ~SDLRenderer() noexcept;
-
-  SDLRenderer(SDLRenderer const&) = delete;
-
-  SDLRenderer& operator=(SDLRenderer const&) = delete;
 
   SDLRenderer(SDLRenderer&& src) noexcept;
 

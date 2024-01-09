@@ -7,8 +7,9 @@
 #include <SDL_ttf.h>
 
 #include <functional>
-#include <future>
 #include <string>
+
+#include "../AssetManager.hxx"
 
 class SDLRenderer;
 
@@ -18,7 +19,7 @@ public:
 
   void set_pressed(bool pressed);
 
-  bool is_pressed() const;
+  [[nodiscard]] bool is_pressed() const;
 
   void update();
 
@@ -32,7 +33,7 @@ public:
 
   void resize(int w, int h);
 
-  SDL_Rect get_bounding_box() const;
+  [[nodiscard]] SDL_Rect get_bounding_box() const;
 
 private:
   std::string title_;
@@ -40,9 +41,9 @@ private:
   bool pressed_;
   std::function<void()> on_click_;
 
-  std::shared_future<SDL_Texture*> up_;
-  std::shared_future<SDL_Texture*> down_;
-  std::shared_future<TTF_Font*> font_;
+  Asset<SDL_Texture*> up_;
+  Asset<SDL_Texture*> down_;
+  Asset<TTF_Font*> font_;
 };
 
 #endif // SNAKE_BUTTON_HXX

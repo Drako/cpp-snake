@@ -10,6 +10,8 @@
 
 #include <stack>
 
+#include <boost/noncopyable.hpp>
+
 enum class GameStates {
   Loading,
   Splash,
@@ -18,15 +20,11 @@ enum class GameStates {
   GameOver,
 };
 
-class GameStateManager final {
+class GameStateManager final : private boost::noncopyable {
 public:
   GameStateManager();
 
   ~GameStateManager();
-
-  GameStateManager(GameStateManager const&) = delete;
-
-  GameStateManager& operator=(GameStateManager) = delete;
 
   GameState* current();
 

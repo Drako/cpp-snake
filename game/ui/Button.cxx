@@ -1,94 +1,32 @@
 #include "Button.hxx"
 
-#include "../AssetManager.hxx"
-
 #include "../../SDLRenderer.hxx"
 
 #include <cassert>
 
 namespace {
-  SDL_Rect const UPPER_LEFT{
-      .x = 0,
-      .y = 0,
-      .w = 6,
-      .h = 5,
+  SDL_Rect const TEXTURE_RECTS_UP[] = {
+      {.x = 0, .y = 0, .w = 6, .h = 5}, // UPPER_LEFT
+      {.x = 6, .y = 0, .w = 37, .h = 5}, // UPPER_EDGE
+      {.x = 43, .y = 0, .w = 6, .h = 5}, // UPPER_RIGHT
+      {.x = 0, .y = 5, .w = 6, .h = 35}, // LEFT_EDGE
+      {.x = 6, .y = 5, .w = 37, .h = 35}, // CENTER
+      {.x = 43, .y = 5, .w = 6, .h = 35}, // RIGHT_EDGE
+      {.x = 0, .y = 40, .w = 6, .h = 9}, // LOWER_LEFT
+      {.x = 6, .y = 40, .w = 37, .h = 9}, // LOWER_EDGE
+      {.x = 43, .y = 40, .w = 6, .h = 9}, // LOWER_RIGHT
   };
 
-  SDL_Rect const UPPER_EDGE{
-      .x = 6,
-      .y = 0,
-      .w = 37,
-      .h = 5,
-  };
-
-  SDL_Rect const UPPER_RIGHT{
-      .x = 43,
-      .y = 0,
-      .w = 6,
-      .h = 5,
-  };
-
-  SDL_Rect const LEFT_EDGE{
-      .x = 0,
-      .y = 5,
-      .w = 6,
-      .h = 35,
-  };
-
-  SDL_Rect const CENTER{
-      .x = 6,
-      .y = 5,
-      .w = 37,
-      .h = 35,
-  };
-
-  SDL_Rect const RIGHT_EDGE{
-      .x = 43,
-      .y = 5,
-      .w = 6,
-      .h = 35,
-  };
-
-  SDL_Rect const LOWER_LEFT_UP{
-      .x = 0,
-      .y = 40,
-      .w = 6,
-      .h = 9,
-  };
-
-  SDL_Rect const LOWER_EDGE_UP{
-      .x = 6,
-      .y = 40,
-      .w = 37,
-      .h = 9,
-  };
-
-  SDL_Rect const LOWER_RIGHT_UP{
-      .x = 43,
-      .y = 40,
-      .w = 6,
-      .h = 9,
-  };
-
-  SDL_Rect const LOWER_LEFT_DOWN{
-      .x = 0,
-      .y = 40,
-      .w = 6,
-      .h = 5,
-  };
-
-  SDL_Rect const LOWER_EDGE_DOWN{
-      .x = 6,
-      .y = 40,
-      .w = 37,
-      .h = 5,
-  };
-
-  SDL_Rect const LOWER_RIGHT_DOWN{
-      .x = 43,
-      .y = 40,
-      .w = 6,
-      .h = 5,
+  SDL_Rect const TEXTURE_RECTS_DOWN[] = {
+      {.x = 0, .y = 0, .w = 6, .h = 5}, // UPPER_LEFT
+      {.x = 6, .y = 0, .w = 37, .h = 5}, // UPPER_EDGE
+      {.x = 43, .y = 0, .w = 6, .h = 5}, // UPPER_RIGHT
+      {.x = 0, .y = 5, .w = 6, .h = 35}, // LEFT_EDGE
+      {.x = 6, .y = 5, .w = 37, .h = 35}, // CENTER
+      {.x = 43, .y = 5, .w = 6, .h = 35}, // RIGHT_EDGE
+      {.x = 0, .y = 40, .w = 6, .h = 5}, // LOWER_LEFT
+      {.x = 6, .y = 40, .w = 37, .h = 5}, // LOWER_EDGE
+      {.x = 43, .y = 40, .w = 6, .h = 5}, // LOWER_RIGHT
   };
 
   SDL_Rect calculate_text_rect(SDL_Rect const& area, SDL_Texture* texture)
@@ -119,22 +57,15 @@ namespace {
 }
 
 Button::Button(std::string title, int x, int y, int w, int h)
-    :title_{std::move(title)}, x_{x}, y_{y}, w_{w}, h_{h}, pressed_{false}
+    :title_{std::move(title)}, x_{x}, y_{y}, w_{w}, h_{h}, pressed_{false},
+     up_{"blue_button_up.png"},
+     down_{"blue_button_down.png"},
+     font_{"kenney_pixel.ttf"}
 {
   assert(w_>=12);
   assert(h_>=14);
 
   on_click_ = [] { };
-
-  up_ = std::async(std::launch::deferred, [] {
-    return AssetManager::instance().get_texture_asset("blue_button_up.png");
-  });
-  down_ = std::async(std::launch::deferred, [] {
-    return AssetManager::instance().get_texture_asset("blue_button_down.png");
-  });
-  font_ = std::async(std::launch::deferred, [] {
-    return AssetManager::instance().get_font_asset("kenney_pixel.ttf");
-  });
 }
 
 void Button::set_pressed(bool const pressed)
@@ -149,166 +80,47 @@ bool Button::is_pressed() const
 
 void Button::render(SDLRenderer& renderer)
 {
-  auto const text = TTF_RenderUTF8_Solid(font_.get(), title_.c_str(), {0, 0, 0, SDL_ALPHA_OPAQUE});
+  auto const text = TTF_RenderUTF8_Solid(font_, title_.c_str(), {0, 0, 0, SDL_ALPHA_OPAQUE});
   auto const text_ure = SDL_CreateTextureFromSurface(renderer, text);
   SDL_FreeSurface(text);
 
+  SDL_Texture* texture;
+  SDL_Rect const* texture_rects;
+  SDL_Rect target_rects[9];
   if (pressed_) {
-    auto const down = down_.get();
+    texture = down_;
+    texture_rects = ::TEXTURE_RECTS_DOWN;
 
-    SDL_Rect const upper_left{
-        .x = x_,
-        .y = y_+4,
-        .w = 6,
-        .h = 5,
-    };
-    SDL_RenderCopy(renderer, down, &::UPPER_LEFT, &upper_left);
-
-    SDL_Rect const upper_edge{
-        .x = x_+6,
-        .y = y_+4,
-        .w = w_-12,
-        .h = 5,
-    };
-    SDL_RenderCopy(renderer, down, &::UPPER_EDGE, &upper_edge);
-
-    SDL_Rect const upper_right{
-        .x = x_+w_-6,
-        .y = y_+4,
-        .w = 6,
-        .h = 5,
-    };
-    SDL_RenderCopy(renderer, down, &::UPPER_RIGHT, &upper_right);
-
-    SDL_Rect const left_edge{
-        .x = x_,
-        .y = y_+9,
-        .w = 6,
-        .h = h_-14,
-    };
-    SDL_RenderCopy(renderer, down, &::LEFT_EDGE, &left_edge);
-
-    SDL_Rect const center{
-        .x = x_+6,
-        .y = y_+9,
-        .w = w_-12,
-        .h = h_-14,
-    };
-    SDL_RenderCopy(renderer, down, &::CENTER, &center);
-
-    SDL_Rect const text_rect = ::calculate_text_rect(center, text_ure);
-    SDL_RenderCopy(renderer, text_ure, nullptr, &text_rect);
-
-    SDL_Rect const right_edge{
-        .x = x_+w_-6,
-        .y = y_+9,
-        .w = 6,
-        .h = h_-14,
-    };
-    SDL_RenderCopy(renderer, down, &::RIGHT_EDGE, &right_edge);
-
-    SDL_Rect const lower_left{
-        .x = x_,
-        .y = y_+h_-5,
-        .w = 6,
-        .h = 5,
-    };
-    SDL_RenderCopy(renderer, down, &::LOWER_LEFT_DOWN, &lower_left);
-
-    SDL_Rect const lower_edge{
-        .x = x_+6,
-        .y = y_+h_-5,
-        .w = w_-12,
-        .h = 5,
-    };
-    SDL_RenderCopy(renderer, down, &::LOWER_EDGE_DOWN, &lower_edge);
-
-    SDL_Rect const lower_right{
-        .x = x_+w_-6,
-        .y = y_+h_-5,
-        .w = 6,
-        .h = 5,
-    };
-    SDL_RenderCopy(renderer, down, &::LOWER_RIGHT_DOWN, &lower_right);
+    target_rects[0] = {.x = x_, .y = y_+4, .w = 6, .h = 5};
+    target_rects[1] = {.x = x_+6, .y = y_+4, .w = w_-12, .h = 5};
+    target_rects[2] = {.x = x_+w_-6, .y = y_+4, .w = 6, .h = 5};
+    target_rects[3] = {.x = x_, .y = y_+9, .w = 6, .h = h_-14};
+    target_rects[4] = {.x = x_+6, .y = y_+9, .w = w_-12, .h = h_-14};
+    target_rects[5] = {.x = x_+w_-6, .y = y_+9, .w = 6, .h = h_-14};
+    target_rects[6] = {.x = x_, .y = y_+h_-5, .w = 6, .h = 5};
+    target_rects[7] = {.x = x_+6, .y = y_+h_-5, .w = w_-12, .h = 5};
+    target_rects[8] = {.x = x_+w_-6, .y = y_+h_-5, .w = 6, .h = 5};
   }
   else {
-    auto const up = up_.get();
+    texture = up_;
+    texture_rects = ::TEXTURE_RECTS_UP;
 
-    SDL_Rect const upper_left{
-        .x = x_,
-        .y = y_,
-        .w = 6,
-        .h = 5,
-    };
-    SDL_RenderCopy(renderer, up, &::UPPER_LEFT, &upper_left);
-
-    SDL_Rect const upper_edge{
-        .x = x_+6,
-        .y = y_,
-        .w = w_-12,
-        .h = 5,
-    };
-    SDL_RenderCopy(renderer, up, &::UPPER_EDGE, &upper_edge);
-
-    SDL_Rect const upper_right{
-        .x = x_+w_-6,
-        .y = y_,
-        .w = 6,
-        .h = 5,
-    };
-    SDL_RenderCopy(renderer, up, &::UPPER_RIGHT, &upper_right);
-
-    SDL_Rect const left_edge{
-        .x = x_,
-        .y = y_+5,
-        .w = 6,
-        .h = h_-14,
-    };
-    SDL_RenderCopy(renderer, up, &::LEFT_EDGE, &left_edge);
-
-    SDL_Rect const center{
-        .x = x_+6,
-        .y = y_+5,
-        .w = w_-12,
-        .h = h_-14,
-    };
-    SDL_RenderCopy(renderer, up, &::CENTER, &center);
-
-    SDL_Rect const text_rect = ::calculate_text_rect(center, text_ure);
-    SDL_RenderCopy(renderer, text_ure, nullptr, &text_rect);
-
-    SDL_Rect const right_edge{
-        .x = x_+w_-6,
-        .y = y_+5,
-        .w = 6,
-        .h = h_-14,
-    };
-    SDL_RenderCopy(renderer, up, &::RIGHT_EDGE, &right_edge);
-
-    SDL_Rect const lower_left{
-        .x = x_,
-        .y = y_+h_-9,
-        .w = 6,
-        .h = 9,
-    };
-    SDL_RenderCopy(renderer, up, &::LOWER_LEFT_UP, &lower_left);
-
-    SDL_Rect const lower_edge{
-        .x = x_+6,
-        .y = y_+h_-9,
-        .w = w_-12,
-        .h = 9,
-    };
-    SDL_RenderCopy(renderer, up, &::LOWER_EDGE_UP, &lower_edge);
-
-    SDL_Rect const lower_right{
-        .x = x_+w_-6,
-        .y = y_+h_-9,
-        .w = 6,
-        .h = 9,
-    };
-    SDL_RenderCopy(renderer, up, &::LOWER_RIGHT_UP, &lower_right);
+    target_rects[0] = {.x = x_, .y = y_, .w = 6, .h = 5};
+    target_rects[1] = {.x = x_+6, .y = y_, .w = w_-12, .h = 5};
+    target_rects[2] = {.x = x_+w_-6, .y = y_, .w = 6, .h = 5};
+    target_rects[3] = {.x = x_, .y = y_+5, .w = 6, .h = h_-14};
+    target_rects[4] = {.x = x_+6, .y = y_+5, .w = w_-12, .h = h_-14};
+    target_rects[5] = {.x = x_+w_-6, .y = y_+5, .w = 6, .h = h_-14};
+    target_rects[6] = {.x = x_, .y = y_+h_-9, .w = 6, .h = 9};
+    target_rects[7] = {.x = x_+6, .y = y_+h_-9, .w = w_-12, .h = 9};
+    target_rects[8] = {.x = x_+w_-6, .y = y_+h_-9, .w = 6, .h = 9};
   }
+
+  for (int n = 0; n<9; ++n)
+    SDL_RenderCopy(renderer, texture, texture_rects+n, target_rects+n);
+
+  SDL_Rect const text_rect = ::calculate_text_rect(target_rects[4], text_ure);
+  SDL_RenderCopy(renderer, text_ure, nullptr, &text_rect);
 
   SDL_DestroyTexture(text_ure);
 }

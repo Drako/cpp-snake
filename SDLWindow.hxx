@@ -7,15 +7,13 @@
 
 #include <string_view>
 
-class SDLWindow final {
+#include <boost/noncopyable.hpp>
+
+class SDLWindow final : private boost::noncopyable {
 public:
   SDLWindow(std::string_view title, int x, int y, int w, int h, std::uint32_t flags = 0u);
 
   ~SDLWindow() noexcept;
-
-  SDLWindow(SDLWindow const&) = delete;
-
-  SDLWindow& operator=(SDLWindow const&) = delete;
 
   SDLWindow(SDLWindow&& src) noexcept;
 

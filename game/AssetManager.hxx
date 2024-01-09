@@ -7,19 +7,18 @@
 
 #include <atomic>
 #include <filesystem>
+#include <optional>
 #include <thread>
 #include <unordered_map>
 
 #include <SDL_ttf.h>
 
-class AssetManager final {
+#include <boost/noncopyable.hpp>
+
+class AssetManager final : private boost::noncopyable {
 
 public:
   explicit AssetManager(SDLRenderer& renderer);
-
-  AssetManager(AssetManager const&) = delete;
-
-  AssetManager& operator=(AssetManager const&) = delete;
 
   ~AssetManager();
 
@@ -45,6 +44,65 @@ private:
   std::unordered_map<std::string, SDL_Surface*> surface_assets_;
   std::unordered_map<std::string, SDL_Texture*> texture_assets_;
   std::unordered_map<std::string, TTF_Font*> font_assets_;
+};
+
+template<typename T>
+struct AssetTraits;
+
+template<>
+struct AssetTraits<SDL_Texture*> final {
+  using type = SDL_Texture*;
+
+  static type get(std::string const& name)
+  {
+    return AssetManager::instance().get_texture_asset(name);
+  }
+};
+
+template<>
+struct AssetTraits<TTF_Font*> final {
+  using type = TTF_Font*;
+
+  static type get(std::string const& name)
+  {
+    return AssetManager::instance().get_font_asset(name);
+  }
+};
+
+template<typename T>
+class Asset final {
+  using traits = AssetTraits<T>;
+
+public:
+  explicit Asset(std::string name)
+      :name_{std::move(name)}
+  {
+  }
+
+  Asset(Asset const&) = default;
+
+  Asset& operator=(Asset const&) = default;
+
+  operator T& () { // NOLINT(*-explicit-constructor)
+    evaluate();
+    return asset_.value();
+  }
+
+  operator T const& () const { // NOLINT(*-explicit-constructor)
+    evaluate();
+    return asset_.value();
+  }
+
+private:
+  void evaluate() const
+  {
+    if (!asset_.has_value()) {
+      asset_ = traits::get(name_);
+    }
+  }
+
+  std::string name_;
+  mutable std::optional<T> asset_;
 };
 
 #endif // SNAKE_ASSETMANAGER_HXX
