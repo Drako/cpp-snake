@@ -5,6 +5,8 @@
 
 void DummyState::on_enter(GameStateManager& gsm)
 {
+  name_input_.set_focus(true);
+
   pause_button_.set_on_click([&gsm] {
     gsm.push_state(GameStates::MainMenu);
   });

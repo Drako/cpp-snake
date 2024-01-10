@@ -73,14 +73,12 @@ bool LineInput::has_focus() const
 
 void LineInput::update(std::chrono::milliseconds const delta_time)
 {
-  blink_timer_ = (blink_timer_+delta_time)%6'000u;
+  blink_timer_ = (blink_timer_+delta_time)%1'000u;
 }
 
 void LineInput::render(SDLRenderer& renderer)
 {
-  auto const text = TTF_RenderUTF8_Solid(font_, value_.c_str(), {0, 0, 0, SDL_ALPHA_OPAQUE});
-  auto const text_ure = SDL_CreateTextureFromSurface(renderer, text);
-  SDL_FreeSurface(text);
+  using namespace std::chrono_literals;
 
   SDL_Texture* const background = texture_;
   SDL_Rect const target_rects[9] = {
@@ -97,11 +95,25 @@ void LineInput::render(SDLRenderer& renderer)
 
   for (int n = 0; n<9; ++n)
     SDL_RenderCopy(renderer, background, ::TEXTURE_RECTS+n, target_rects+n);
+
+  auto const text = TTF_RenderUTF8_Solid(font_, value_.c_str(), {0, 0, 0, SDL_ALPHA_OPAQUE});
+  auto const text_ure = SDL_CreateTextureFromSurface(renderer, text);
+  SDL_FreeSurface(text);
   auto const text_rect = ::calculate_text_rect(target_rects[4], text_ure);
   SDL_Rect const text_texture_rect{
       .x = 0, .y = 0, .w = text_rect.w, .h = text_rect.h,
   };
   SDL_RenderCopy(renderer, text_ure, &text_texture_rect, &text_rect);
-
   SDL_DestroyTexture(text_ure);
+
+  if(focus_) {
+    SDL_Rect cursor_rect{
+        .x = text_rect.x + text_rect.w + 1, .y = text_rect.y, .w = 2, .h = text_rect.h,
+    };
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+    if(blink_timer_ < 500ms) {
+        SDL_RenderFillRect(renderer, &cursor_rect);
+    }
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+  }
 }
