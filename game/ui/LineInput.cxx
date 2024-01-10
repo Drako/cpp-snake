@@ -86,7 +86,7 @@ void LineInput::on_event(SDL_Event const& evt)
   if (evt.type==SDL_TEXTINPUT) {
     value_ += evt.text.text;
   }
-  else if (evt.type==SDL_KEYUP && evt.key.keysym.sym==SDLK_BACKSPACE) {
+  else if (evt.type==SDL_KEYDOWN && evt.key.keysym.sym==SDLK_BACKSPACE) {
     if (!value_.empty()) {
       auto const begin = value_.begin();
       auto const end = value_.end();
