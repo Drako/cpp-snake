@@ -20,6 +20,11 @@ void main_loop(SDLRenderer& renderer)
     while (SDL_PollEvent(&evt)!=0) {
       if (evt.type==SDL_QUIT)
         return;
+
+      auto const state = gsm.current();
+      if (state==nullptr)
+        return;
+      state->on_event(gsm, evt);
     }
 
     auto const state = gsm.current();

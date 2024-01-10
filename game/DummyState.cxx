@@ -5,11 +5,25 @@
 
 void DummyState::on_enter(GameStateManager& gsm)
 {
+  name_input_.set_value("");
   name_input_.set_focus(true);
 
   pause_button_.set_on_click([&gsm] {
     gsm.push_state(GameStates::MainMenu);
   });
+}
+
+void DummyState::on_leave()
+{
+  SDL_StopTextInput();
+}
+
+void DummyState::on_event(GameStateManager& gsm, SDL_Event const& evt)
+{
+  name_input_.on_event(evt);
+
+  if (evt.type==SDL_KEYUP && evt.key.keysym.scancode==SDL_SCANCODE_ESCAPE)
+    gsm.push_state(GameStates::MainMenu);
 }
 
 void DummyState::update(GameStateManager& gsm, std::chrono::milliseconds delta_time)

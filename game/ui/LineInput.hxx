@@ -16,6 +16,8 @@ public:
 
   LineInput(int x, int y, int w, int h, std::string value = "");
 
+  void on_event(SDL_Event const& evt);
+
   void update(std::chrono::milliseconds delta_time);
 
   void render(SDLRenderer& renderer);
@@ -30,6 +32,10 @@ public:
   void set_focus(bool focus);
 
   [[nodiscard]] bool has_focus() const;
+
+  void set_value(std::string value);
+
+  [[nodiscard]]char const* value() const;
 
 private:
   std::string value_;

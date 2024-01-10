@@ -4,11 +4,27 @@
 
 using namespace std::chrono_literals;
 
+void SplashState::on_event(GameStateManager& gsm, SDL_Event const& evt)
+{
+  if (evt.type==SDL_KEYUP) {
+    switch (evt.key.keysym.scancode) {
+    default:
+      break;
+    case SDL_SCANCODE_SPACE:
+      [[fallthrough]];
+    case SDL_SCANCODE_RETURN:
+      [[fallthrough]];
+    case SDL_SCANCODE_ESCAPE:
+      gsm.replace_state(GameStates::MainMenu);
+      break;
+    }
+  }
+}
+
 void SplashState::update(GameStateManager& gsm, std::chrono::milliseconds delta_time)
 {
   time_in_state_ += delta_time;
-  auto const key_state = SDL_GetKeyboardState(nullptr);
-  if (time_in_state_>13'000ms || key_state[SDL_SCANCODE_SPACE] || key_state[SDL_SCANCODE_RETURN])
+  if (time_in_state_>13'000ms)
     gsm.replace_state(GameStates::MainMenu);
 }
 

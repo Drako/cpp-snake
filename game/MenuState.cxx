@@ -21,6 +21,13 @@ void MenuState::on_enter(GameStateManager& gsm)
   });
 }
 
+void MenuState::on_event(GameStateManager& gsm, SDL_Event const& evt)
+{
+  if (evt.type==SDL_KEYUP && evt.key.keysym.scancode==SDL_SCANCODE_ESCAPE) {
+    gsm.pop_state();
+  }
+}
+
 void MenuState::update(GameStateManager& gsm, std::chrono::milliseconds delta_time)
 {
   (void) delta_time;
@@ -30,13 +37,6 @@ void MenuState::update(GameStateManager& gsm, std::chrono::milliseconds delta_ti
   new_game_button_.update();
   continue_button_.update();
   quit_button_.update();
-
-  auto const key_state = SDL_GetKeyboardState(nullptr);
-  auto const escape_pressed = !!key_state[SDL_SCANCODE_ESCAPE];
-  if (!escape_pressed && escape_pressed_) {
-    gsm.pop_state();
-  }
-  escape_pressed_ = escape_pressed;
 }
 
 void MenuState::render(SDLRenderer& renderer)
