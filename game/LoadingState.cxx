@@ -51,3 +51,8 @@ void LoadingState::render(SDLRenderer& renderer)
 
   SDL_RenderPresent(renderer);
 }
+
+void LoadingState::on_enter(GameStateManager& gsm)
+{
+  SDL_ShowCursor(SDL_DISABLE);
+}

@@ -35,6 +35,8 @@ void MenuState::on_enter(GameStateManager& gsm)
       gsm.pop_state();
     }
   });
+
+  SDL_ShowCursor(SDL_ENABLE);
 }
 
 void MenuState::on_event(GameStateManager& gsm, SDL_Event const& evt)
@@ -83,7 +85,7 @@ void MenuState::render(SDLRenderer& renderer)
   }
   high_score_button_.move(x, y += BUTTON_HEIGHT+20);
   credits_button_.move(x, y += BUTTON_HEIGHT+20);
-  quit_button_.move(x, y + BUTTON_HEIGHT+20);
+  quit_button_.move(x, y+BUTTON_HEIGHT+20);
 
   SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
   SDL_RenderClear(renderer);
@@ -102,4 +104,9 @@ void MenuState::render(SDLRenderer& renderer)
   quit_button_.render(renderer);
 
   SDL_RenderPresent(renderer);
+}
+
+void MenuState::on_leave()
+{
+  SDL_ShowCursor(SDL_DISABLE);
 }

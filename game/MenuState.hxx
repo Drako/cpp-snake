@@ -14,6 +14,8 @@ class MenuState final : public GameState {
 public:
   void on_enter(GameStateManager& gsm) override;
 
+  void on_leave() override;
+
   void on_event(GameStateManager& gsm, SDL_Event const& evt) override;
 
   void update(GameStateManager& gsm, std::chrono::milliseconds delta_time) override;
