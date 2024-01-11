@@ -6,6 +6,7 @@
 #include "LoadingState.hxx"
 #include "SplashState.hxx"
 #include "MenuState.hxx"
+#include "PlayingState.hxx"
 #include "DummyState.hxx"
 
 #include <stack>
@@ -44,6 +45,7 @@ private:
   LoadingState loading_;
   SplashState splash_;
   MenuState menu_;
+  PlayingState game_;
   DummyState dummy_;
 };
 

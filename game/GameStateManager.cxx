@@ -24,6 +24,8 @@ GameState* GameStateManager::enum_to_state(GameStates const state)
     return &splash_;
   case GameStates::MainMenu:
     return &menu_;
+  case GameStates::Game:
+    return &game_;
   }
 }
 
