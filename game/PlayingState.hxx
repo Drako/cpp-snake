@@ -42,7 +42,7 @@ private:
 
   void place_head();
 
-  void place_target();
+  bool place_target();
 
   void render_ui(SDLRenderer& renderer, SDL_Rect const& playing_field);
 
@@ -54,7 +54,7 @@ private:
 
   void handle_direction_change();
 
-  std::default_random_engine generator_;
+  std::mt19937 generator_;
   std::uniform_int_distribution<int> distribution_position_x_{0, CELLS_X-1};
   std::uniform_int_distribution<int> distribution_position_y_{0, CELLS_Y-1};
 

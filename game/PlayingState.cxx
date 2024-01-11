@@ -7,6 +7,22 @@
 #include <cmath>
 #include <format>
 #include <random>
+#include <unordered_set>
+
+#include <boost/functional/hash.hpp>
+
+namespace std {
+  template<>
+  struct hash<SDL_Point> {
+    std::size_t operator()(SDL_Point const& p) const noexcept
+    {
+      std::size_t seed{0u};
+      boost::hash_combine(seed, p.x);
+      boost::hash_combine(seed, p.y);
+      return seed;
+    }
+  };
+}
 
 namespace {
   SDL_Point head_position(SDL_FPoint const& position)
@@ -100,7 +116,10 @@ void PlayingState::update(GameStateManager& gsm, std::chrono::milliseconds const
     if (new_pos==target_) {
       ++length_;
       speed_ = std::min(MAX_SPEED, speed_*ACCELERATION);
-      place_target();
+      if (!place_target()) {
+        // technically the player finished the game at this point
+        gsm.replace_state(GameStates::GameOver);
+      }
     }
 
     if (detect_death(new_pos)) {
@@ -164,10 +183,30 @@ void PlayingState::render_ui(SDLRenderer& renderer, SDL_Rect const& playing_fiel
   SDL_RenderDrawRect(renderer, &playing_field);
 }
 
-void PlayingState::place_target()
+bool PlayingState::place_target()
 {
-  target_.x = distribution_position_x_(generator_);
-  target_.y = distribution_position_y_(generator_);
+  std::unordered_set<SDL_Point> field;
+  field.reserve(CELLS_X*CELLS_Y);
+  for (int x = 0; x<CELLS_X; ++x) {
+    for (int y = 0; y<CELLS_Y; ++y) {
+      field.insert({x, y});
+    }
+  }
+
+  for (auto const& particle: tail_) {
+    field.erase(particle);
+  }
+
+  if (field.empty()) {
+    return false;
+  }
+
+  std::vector<SDL_Point> result;
+  std::ranges::sample(field, std::back_inserter(result), 1, generator_);
+
+  target_ = result[0];
+
+  return true;
 }
 
 void PlayingState::place_head()
@@ -263,9 +302,9 @@ void PlayingState::render_game(SDLRenderer& renderer, bool is_current_state)
     SDL_RenderClear(renderer);
   }
 
-  render_ui(renderer, playing_field);
   render_snake(renderer, playing_field);
   render_target(renderer, playing_field);
+  render_ui(renderer, playing_field);
 
   if (is_current_state)
     SDL_RenderPresent(renderer);
