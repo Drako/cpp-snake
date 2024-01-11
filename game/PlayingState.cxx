@@ -1,5 +1,6 @@
 #include "PlayingState.hxx"
 
+#include "HighScoreManager.hxx"
 #include "GameStateManager.hxx"
 
 #include <algorithm>
@@ -118,11 +119,13 @@ void PlayingState::update(GameStateManager& gsm, std::chrono::milliseconds const
       speed_ = std::min(MAX_SPEED, speed_*ACCELERATION);
       if (!place_target()) {
         // technically the player finished the game at this point
+        HighScoreManager::instance().set_new_score(length_);
         gsm.replace_state(GameStates::GameOver);
       }
     }
 
     if (detect_death(new_pos)) {
+      HighScoreManager::instance().set_new_score(length_);
       gsm.replace_state(GameStates::GameOver);
     }
 

@@ -33,6 +33,10 @@ public:
 
   [[nodiscard]] bool has_focus() const;
 
+  void set_visible(bool visible);
+
+  [[nodiscard]] bool is_visible() const;
+
   void set_value(std::string value);
 
   [[nodiscard]]char const* value() const;
@@ -41,6 +45,7 @@ private:
   std::string value_;
   int x_, y_, w_, h_;
   bool focus_;
+  bool visible_;
 
   Asset<SDL_Texture*> texture_;
   Asset<TTF_Font*> font_;

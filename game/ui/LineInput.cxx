@@ -39,6 +39,7 @@ namespace {
 
 LineInput::LineInput(int const x, int const y, int const w, int const h, std::string value)
     :value_{std::move(value)}, x_{x}, y_{y}, w_{w}, h_{h}, focus_{false},
+     visible_{true},
      texture_{"line_input.png"},
      font_{"kenney_pixel.ttf"}
 {
@@ -80,7 +81,7 @@ bool LineInput::has_focus() const
 
 void LineInput::on_event(SDL_Event const& evt)
 {
-  if (!focus_)
+  if (!focus_ || !visible_)
     return;
 
   if (evt.type==SDL_TEXTINPUT) {
@@ -102,6 +103,9 @@ void LineInput::on_event(SDL_Event const& evt)
 
 void LineInput::update(std::chrono::milliseconds const delta_time)
 {
+  if (!visible_)
+    return;
+
   if (focus_ && !SDL_IsTextInputActive())
     SDL_StartTextInput();
 
@@ -112,6 +116,9 @@ void LineInput::update(std::chrono::milliseconds const delta_time)
 
 void LineInput::render(SDLRenderer& renderer)
 {
+  if (!visible_)
+    return;
+
   using namespace std::chrono_literals;
 
   SDL_Texture* const background = texture_;
@@ -160,4 +167,14 @@ char const* LineInput::value() const
 void LineInput::set_value(std::string value)
 {
   value_ = std::move(value);
+}
+
+bool LineInput::is_visible() const
+{
+  return visible_;
+}
+
+void LineInput::set_visible(bool visible)
+{
+  visible_ = visible;
 }

@@ -7,6 +7,7 @@
 #include "SplashState.hxx"
 #include "MenuState.hxx"
 #include "PlayingState.hxx"
+#include "GameOverState.hxx"
 #include "DummyState.hxx"
 
 #include <stack>
@@ -48,6 +49,7 @@ private:
   SplashState splash_;
   MenuState menu_;
   PlayingState game_;
+  GameOverState game_over_;
   DummyState dummy_;
 };
 

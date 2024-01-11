@@ -48,6 +48,8 @@ add_executable(Snake WIN32
     game/ui/Button.cxx game/ui/Button.hxx
     game/ui/LineInput.cxx game/ui/LineInput.hxx
     game/ui/UiColor.hxx game/ui/UiColor.cxx
+    game/HighScoreManager.cxx game/HighScoreManager.hxx
+    game/GameOverState.cxx game/GameOverState.hxx
 )
 
 target_link_libraries(Snake PRIVATE
