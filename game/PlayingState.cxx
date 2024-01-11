@@ -59,44 +59,12 @@ void PlayingState::on_event(GameStateManager& gsm, SDL_Event const& evt)
     if (scancode==SDL_SCANCODE_ESCAPE || scancode==SDL_SCANCODE_PAUSE)
       gsm.push_state(GameStates::MainMenu);
   }
-  else if (evt.type==SDL_KEYDOWN) {
-    switch (evt.key.keysym.scancode) {
-    default:
-      break;
-    case SDL_SCANCODE_UP:
-      [[fallthrough]];
-    case SDL_SCANCODE_W:
-      if (direction_==Direction::Left || direction_==Direction::Right) {
-        new_direction_ = Direction::Up;
-      }
-      break;
-    case SDL_SCANCODE_S:
-      [[fallthrough]];
-    case SDL_SCANCODE_DOWN:
-      if (direction_==Direction::Left || direction_==Direction::Right) {
-        new_direction_ = Direction::Down;
-      }
-      break;
-    case SDL_SCANCODE_A:
-      [[fallthrough]];
-    case SDL_SCANCODE_LEFT:
-      if (direction_==Direction::Up || direction_==Direction::Down) {
-        new_direction_ = Direction::Left;
-      }
-      break;
-    case SDL_SCANCODE_D:
-      [[fallthrough]];
-    case SDL_SCANCODE_RIGHT:
-      if (direction_==Direction::Up || direction_==Direction::Down) {
-        new_direction_ = Direction::Right;
-      }
-      break;
-    }
-  }
 }
 
 void PlayingState::update(GameStateManager& gsm, std::chrono::milliseconds const delta_time)
 {
+  handle_direction_change();
+
   auto const distance = speed_*static_cast<float>(delta_time.count());
   if (distance>MAX_DISTANCE) {
     SDL_Log("Snake would move a distance of %f. Game might have been stuck. Skipping cycle.", distance);
@@ -145,6 +113,32 @@ void PlayingState::update(GameStateManager& gsm, std::chrono::milliseconds const
   }
 
   head_ = new_head;
+}
+
+void PlayingState::handle_direction_change()
+{
+  // this is not done in the event handler as we don't want to wait for KEYUP to re-fire in certain situations
+  auto const keyboard = SDL_GetKeyboardState(nullptr);
+  if (keyboard[SDL_SCANCODE_UP] || keyboard[SDL_SCANCODE_W]) {
+    if (direction_==Direction::Left || direction_==Direction::Right) {
+      new_direction_ = Direction::Up;
+    }
+  }
+  else if (keyboard[SDL_SCANCODE_DOWN] || keyboard[SDL_SCANCODE_S]) {
+    if (direction_==Direction::Left || direction_==Direction::Right) {
+      new_direction_ = Direction::Down;
+    }
+  }
+  else if (keyboard[SDL_SCANCODE_LEFT] || keyboard[SDL_SCANCODE_A]) {
+    if (direction_==Direction::Up || direction_==Direction::Down) {
+      new_direction_ = Direction::Left;
+    }
+  }
+  else if (keyboard[SDL_SCANCODE_RIGHT] || keyboard[SDL_SCANCODE_D]) {
+    if (direction_==Direction::Up || direction_==Direction::Down) {
+      new_direction_ = Direction::Right;
+    }
+  }
 }
 
 void PlayingState::render(SDLRenderer& renderer)

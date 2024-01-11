@@ -52,6 +52,8 @@ private:
 
   bool detect_death(SDL_Point const& position);
 
+  void handle_direction_change();
+
   std::default_random_engine generator_;
   std::uniform_int_distribution<int> distribution_position_x_{0, CELLS_X-1};
   std::uniform_int_distribution<int> distribution_position_y_{0, CELLS_Y-1};
