@@ -9,7 +9,7 @@ std::string ui_image(std::string_view name, UiColor const color)
     return std::format("blue_{}.png", name);
   case UiColor::Green:
     return std::format("green_{}.png", name);
-  case UiColor::Grey:
+  default:
     return std::format("grey_{}.png", name);
   case UiColor::Red:
     return std::format("red_{}.png", name);

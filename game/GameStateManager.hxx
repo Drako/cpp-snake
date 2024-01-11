@@ -19,6 +19,8 @@ enum class GameStates {
   MainMenu,
   Game,
   GameOver,
+  HighScores,
+  Credits,
 };
 
 class GameStateManager final : private boost::noncopyable {

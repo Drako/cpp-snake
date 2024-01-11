@@ -30,8 +30,6 @@ static bool operator!=(SDL_Point const& lhs, SDL_Point const& rhs)
   return lhs.x!=rhs.x || lhs.y!=rhs.y;
 }
 
-unsigned PlayingState::last_high_score_{0};
-
 PlayingState::PlayingState()
     :generator_{std::random_device{}()}, font_{"kenney_pixel.ttf"}
 {
@@ -56,38 +54,48 @@ void PlayingState::on_enter(GameStateManager& gsm)
 
 void PlayingState::on_event(GameStateManager& gsm, SDL_Event const& evt)
 {
-  if (evt.type==SDL_KEYUP && evt.key.keysym.scancode==SDL_SCANCODE_ESCAPE) {
-    gsm.push_state(GameStates::MainMenu);
+  if (evt.type==SDL_KEYUP) {
+    auto const scancode = evt.key.keysym.scancode;
+    if (scancode==SDL_SCANCODE_ESCAPE || scancode==SDL_SCANCODE_PAUSE)
+      gsm.push_state(GameStates::MainMenu);
   }
   else if (evt.type==SDL_KEYDOWN) {
     switch (evt.key.keysym.scancode) {
     default:
       break;
     case SDL_SCANCODE_UP:
+      [[fallthrough]];
+    case SDL_SCANCODE_W:
       if (direction_==Direction::Left || direction_==Direction::Right) {
-        direction_ = Direction::Up;
+        new_direction_ = Direction::Up;
       }
       break;
+    case SDL_SCANCODE_S:
+      [[fallthrough]];
     case SDL_SCANCODE_DOWN:
       if (direction_==Direction::Left || direction_==Direction::Right) {
-        direction_ = Direction::Down;
+        new_direction_ = Direction::Down;
       }
       break;
+    case SDL_SCANCODE_A:
+      [[fallthrough]];
     case SDL_SCANCODE_LEFT:
       if (direction_==Direction::Up || direction_==Direction::Down) {
-        direction_ = Direction::Left;
+        new_direction_ = Direction::Left;
       }
       break;
+    case SDL_SCANCODE_D:
+      [[fallthrough]];
     case SDL_SCANCODE_RIGHT:
       if (direction_==Direction::Up || direction_==Direction::Down) {
-        direction_ = Direction::Right;
+        new_direction_ = Direction::Right;
       }
       break;
     }
   }
 }
 
-void PlayingState::update(GameStateManager& gsm, std::chrono::milliseconds delta_time)
+void PlayingState::update(GameStateManager& gsm, std::chrono::milliseconds const delta_time)
 {
   auto const distance = speed_*static_cast<float>(delta_time.count());
   if (distance>MAX_DISTANCE) {
@@ -95,8 +103,10 @@ void PlayingState::update(GameStateManager& gsm, std::chrono::milliseconds delta
     return;
   }
 
+  auto const direction = new_direction_.value_or(direction_);
+
   SDL_FPoint new_head = head_;
-  switch (direction_) {
+  switch (direction) {
   case Direction::Up:
     new_head.y -= distance;
     break;
@@ -114,14 +124,18 @@ void PlayingState::update(GameStateManager& gsm, std::chrono::milliseconds delta
   auto const old_pos = ::head_position(head_);
   auto const new_pos = ::head_position(new_head);
   if (old_pos!=new_pos) {
+    if (new_direction_.has_value()) {
+      direction_ = new_direction_.value();
+      new_direction_.reset();
+    }
+
     if (new_pos==target_) {
       ++length_;
-      speed_ *= ACCELERATION;
+      speed_ = std::min(MAX_SPEED, speed_*ACCELERATION);
       place_target();
     }
 
     if (detect_death(new_pos)) {
-      last_high_score_ = length_;
       gsm.replace_state(GameStates::GameOver);
     }
 
@@ -135,33 +149,7 @@ void PlayingState::update(GameStateManager& gsm, std::chrono::milliseconds delta
 
 void PlayingState::render(SDLRenderer& renderer)
 {
-
-  int width, height;
-  SDL_GetRendererOutputSize(renderer, &width, &height);
-
-  SDL_Rect playing_field;
-  double const ratio = static_cast<double>(CELLS_X)/CELLS_Y;
-
-  if (width<height*ratio) {
-    playing_field.w = width-20;
-    playing_field.h = static_cast<int>(playing_field.w/ratio);
-  }
-  else {
-    playing_field.h = height-70;
-    playing_field.w = static_cast<int>(playing_field.h*ratio);
-  }
-
-  playing_field.x = (width-playing_field.w)/2;
-  playing_field.y = 50;
-
-  SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-  SDL_RenderClear(renderer);
-
-  render_ui(renderer, playing_field);
-  render_target(renderer, playing_field);
-  render_snake(renderer, playing_field);
-
-  SDL_RenderPresent(renderer);
+  render_game(renderer);
 }
 
 void PlayingState::render_ui(SDLRenderer& renderer, SDL_Rect const& playing_field)
@@ -178,7 +166,7 @@ void PlayingState::render_ui(SDLRenderer& renderer, SDL_Rect const& playing_fiel
   SDL_RenderCopy(renderer, text, nullptr, &render_quad);
   SDL_DestroyTexture(text);
 
-  SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+  SDL_SetRenderDrawColor(renderer, 249, 95, 0, SDL_ALPHA_OPAQUE);
   SDL_RenderDrawRect(renderer, &playing_field);
 }
 
@@ -211,7 +199,7 @@ void PlayingState::render_target(SDLRenderer& renderer, SDL_Rect const& playing_
       .h = static_cast<int>(ratio),
   };
 
-  SDL_SetRenderDrawColor(renderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
+  SDL_SetRenderDrawColor(renderer, 76, 208, 45, SDL_ALPHA_OPAQUE);
   SDL_RenderFillRect(renderer, &target_rect);
 }
 
@@ -234,13 +222,14 @@ void PlayingState::render_snake(SDLRenderer& renderer, SDL_Rect const& playing_f
   };
 
   SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
-  render_dot(::head_position(head_), 1.0);
   double size = 1.0;
   double const decay = 1.0/static_cast<double>(tail_.size()+1);
   for (auto const& particle: tail_) {
     size = std::max(0.0, size-decay);
     render_dot(particle, size);
   }
+  SDL_SetRenderDrawColor(renderer, 0, 170, 231, SDL_ALPHA_OPAQUE);
+  render_dot(::head_position(head_), 1.0);
 }
 
 bool PlayingState::detect_death(SDL_Point const& position)
@@ -255,7 +244,35 @@ bool PlayingState::detect_death(SDL_Point const& position)
   }));
 }
 
-unsigned PlayingState::last_high_score()
+void PlayingState::render_game(SDLRenderer& renderer, bool is_current_state)
 {
-  return last_high_score_;
+  int width, height;
+  SDL_GetRendererOutputSize(renderer, &width, &height);
+
+  SDL_Rect playing_field;
+  double const ratio = static_cast<double>(CELLS_X)/CELLS_Y;
+
+  if (width<height*ratio) {
+    playing_field.w = width-20;
+    playing_field.h = static_cast<int>(playing_field.w/ratio);
+  }
+  else {
+    playing_field.h = height-70;
+    playing_field.w = static_cast<int>(playing_field.h*ratio);
+  }
+
+  playing_field.x = (width-playing_field.w)/2;
+  playing_field.y = 50;
+
+  if (is_current_state) {
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+    SDL_RenderClear(renderer);
+  }
+
+  render_ui(renderer, playing_field);
+  render_snake(renderer, playing_field);
+  render_target(renderer, playing_field);
+
+  if (is_current_state)
+    SDL_RenderPresent(renderer);
 }

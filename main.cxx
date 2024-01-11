@@ -21,22 +21,25 @@ void main_loop(SDLRenderer& renderer)
       if (evt.type==SDL_QUIT)
         return;
 
-      auto const state = gsm.current();
-      if (state==nullptr)
+      if (auto const state = gsm.current(); state!=nullptr)
+        state->on_event(gsm, evt);
+      else
         return;
-      state->on_event(gsm, evt);
     }
-
-    auto const state = gsm.current();
-    if (state==nullptr)
-      return;
 
     auto const end = high_resolution_clock::now();
     auto const delta_time = duration_cast<milliseconds>(end-start);
     start = end;
 
-    state->update(gsm, delta_time);
-    state->render(renderer);
+    if (auto const state = gsm.current(); state != nullptr)
+      state->update(gsm, delta_time);
+    else
+      return;
+
+    if (auto const state = gsm.current(); state != nullptr)
+      state->render(renderer);
+    else
+      return;
   }
 }
 

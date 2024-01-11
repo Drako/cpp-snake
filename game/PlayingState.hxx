@@ -7,6 +7,7 @@
 #include "AssetManager.hxx"
 
 #include <deque>
+#include <optional>
 #include <random>
 
 enum class Direction {
@@ -35,7 +36,7 @@ public:
 
   void render(SDLRenderer& renderer) override;
 
-  static unsigned last_high_score();
+  void render_game(SDLRenderer& renderer, bool is_current_state = true);
 
 private:
 
@@ -51,16 +52,15 @@ private:
 
   bool detect_death(SDL_Point const& position);
 
-  static unsigned last_high_score_;
-
   std::default_random_engine generator_;
   std::uniform_int_distribution<int> distribution_position_x_{0, CELLS_X-1};
   std::uniform_int_distribution<int> distribution_position_y_{0, CELLS_Y-1};
 
-  SDL_Point target_;
+  SDL_Point target_{};
   unsigned length_{0u};
   Direction direction_{Direction::Left};
-  SDL_FPoint head_;
+  std::optional<Direction> new_direction_{};
+  SDL_FPoint head_{};
   std::deque<SDL_Point> tail_;
   float speed_{0.001f};
 
