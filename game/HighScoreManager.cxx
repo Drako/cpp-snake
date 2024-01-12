@@ -70,6 +70,9 @@ void HighScoreManager::set_new_score(unsigned int score)
   if (high_score_.scores_.size()<MAX_SCORES || high_score_.scores_.back().points_<score) {
     new_score_ = score;
   }
+  else {
+    new_score_.reset();
+  }
 }
 
 bool HighScoreManager::has_new_score() const
