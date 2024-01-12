@@ -23,6 +23,8 @@ public:
   void render(SDLRenderer& renderer) override;
 
 private:
+  static int constexpr ACTIVE_SIZE_DIFF = 8;
+
   static int constexpr BUTTON_HEIGHT = 80;
   static int constexpr BUTTON_WIDTH = 350;
 
@@ -33,6 +35,8 @@ private:
   Button quit_button_{"Quit", 0, 0, BUTTON_WIDTH, BUTTON_HEIGHT, UiColor::Red};
 
   std::optional<PlayingState*> game_{};
+
+  int active_button_{0};
 };
 
 #endif // SNAKE_MENUSTATE_HXX

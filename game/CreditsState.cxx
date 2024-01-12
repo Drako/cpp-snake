@@ -2,8 +2,6 @@
 
 #include "GameStateManager.hxx"
 
-#include <algorithm>
-#include <numeric>
 #include <type_traits>
 
 CreditsState::CreditsState()
