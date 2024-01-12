@@ -2,6 +2,8 @@
 
 #include "GameStateManager.hxx"
 
+#include <algorithm>
+#include <numeric>
 #include <type_traits>
 
 CreditsState::CreditsState()
@@ -24,7 +26,7 @@ void CreditsState::on_enter(GameStateManager& gsm)
       boost_logo_,
   };
 
-  int summed_size = -50;
+  int summed_size = -ITEM_PADDING;
   for (auto const& item: scroll_items_) {
     summed_size += std::visit([font]<typename T>(T const& it) {
       int w, h = 0;
@@ -35,14 +37,14 @@ void CreditsState::on_enter(GameStateManager& gsm)
         int logo_h, text_h;
         TTF_SizeUTF8(font, it.text_, &w, &text_h);
         SDL_QueryTexture(it.texture_, nullptr, nullptr, &w, &logo_h);
-        h = logo_h+10+text_h;
+        h = logo_h+INNER_ITEM_PADDING+text_h;
       }
       else if constexpr (std::is_same_v<T, SDL_Texture*>) {
         SDL_QueryTexture(it, nullptr, nullptr, &w, &h);
       }
       return h;
     }, item);
-    summed_size += 50;
+    summed_size += ITEM_PADDING;
   }
   scroll_size_ = static_cast<double>(summed_size);
 }
@@ -116,12 +118,12 @@ void CreditsState::render(SDLRenderer& renderer)
         SDL_FreeSurface(surface);
 
         SDL_QueryTexture(texture, nullptr, nullptr, &w, &text_h);
-        SDL_Rect const text_rect{.x = (window_width-w)/2, .y = y+logo_h+10, .w = w, .h = text_h};
+        SDL_Rect const text_rect{.x = (window_width-w)/2, .y = y+logo_h+INNER_ITEM_PADDING, .w = w, .h = text_h};
         SDL_RenderCopy(renderer, texture, nullptr, &text_rect);
 
         SDL_DestroyTexture(texture);
 
-        h = logo_h+10+text_h;
+        h = logo_h+INNER_ITEM_PADDING+text_h;
       }
       else if constexpr (std::is_same_v<T, SDL_Texture*>) {
         int w;
@@ -130,7 +132,7 @@ void CreditsState::render(SDLRenderer& renderer)
         SDL_RenderCopy(renderer, it, nullptr, &rect);
       }
 
-      y += h+50;
+      y += h+ITEM_PADDING;
     }, item);
   }
 

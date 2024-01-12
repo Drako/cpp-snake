@@ -17,6 +17,9 @@ struct External final {
 
 class CreditsState final : public GameState {
 public:
+  static int constexpr ITEM_PADDING = 80;
+  static int constexpr INNER_ITEM_PADDING = 10;
+
   CreditsState();
 
   void on_enter(GameStateManager& gsm) override;
