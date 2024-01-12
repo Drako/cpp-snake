@@ -80,6 +80,7 @@ void PlayingState::on_event(GameStateManager& gsm, SDL_Event const& evt)
 void PlayingState::update(GameStateManager& gsm, std::chrono::milliseconds const delta_time)
 {
   handle_direction_change();
+  fps_ = static_cast<int>(1000.0/static_cast<double>(delta_time.count()));
 
   auto const distance = speed_*static_cast<float>(delta_time.count());
   if (distance>MAX_DISTANCE) {
@@ -176,6 +177,15 @@ void PlayingState::render_ui(SDLRenderer& renderer, SDL_Rect const& playing_fiel
   int text_width, text_height;
   SDL_QueryTexture(text, nullptr, nullptr, &text_width, &text_height);
   SDL_Rect render_quad = {playing_field.x, 10, text_width, text_height};
+  SDL_RenderCopy(renderer, text, nullptr, &render_quad);
+  SDL_DestroyTexture(text);
+
+  auto const fps_text = "Frames per second: "+std::to_string(fps_);
+  text_surface = TTF_RenderText_Solid(font_, fps_text.c_str(), {255, 255, 255, SDL_ALPHA_OPAQUE});
+  text = SDL_CreateTextureFromSurface(renderer, text_surface);
+  SDL_FreeSurface(text_surface);
+  SDL_QueryTexture(text, nullptr, nullptr, &text_width, &text_height);
+  render_quad = {playing_field.x+playing_field.w-text_width, 10, text_width, text_height};
   SDL_RenderCopy(renderer, text, nullptr, &render_quad);
   SDL_DestroyTexture(text);
 

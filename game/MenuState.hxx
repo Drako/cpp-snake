@@ -23,7 +23,7 @@ public:
   void render(SDLRenderer& renderer) override;
 
 private:
-  static int constexpr ACTIVE_SIZE_DIFF = 8;
+  static int constexpr ACTIVE_SIZE_DIFF = 32;
 
   static int constexpr BUTTON_HEIGHT = 80;
   static int constexpr BUTTON_WIDTH = 350;

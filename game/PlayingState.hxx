@@ -65,6 +65,7 @@ private:
   SDL_FPoint head_{};
   std::deque<SDL_Point> tail_;
   float speed_{0.001f};
+  int fps_{0};
 
   Asset<TTF_Font*> font_;
 };
