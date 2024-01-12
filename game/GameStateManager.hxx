@@ -9,7 +9,7 @@
 #include "PlayingState.hxx"
 #include "GameOverState.hxx"
 #include "HighScoreState.hxx"
-#include "DummyState.hxx"
+#include "CreditsState.hxx"
 
 #include <stack>
 
@@ -52,7 +52,7 @@ private:
   PlayingState game_;
   GameOverState game_over_;
   HighScoreState high_score_;
-  DummyState dummy_;
+  CreditsState credits_;
 };
 
 #endif // SNAKE_GAMESTATEMANAGER_HXX

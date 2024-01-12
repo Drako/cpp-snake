@@ -1,5 +1,7 @@
 #include "GameStateManager.hxx"
 
+#include <cassert>
+
 GameStateManager::GameStateManager()
     :states_{{GameStates::Loading}}
 {
@@ -17,7 +19,9 @@ GameState* GameStateManager::enum_to_state(GameStates const state)
 {
   switch (state) {
   default:
-    return &dummy_; // TODO: handle all game states
+    // this should no longer be reachable as all states are handled
+    assert(false);
+    break;
   case GameStates::Loading:
     return &loading_;
   case GameStates::Splash:
@@ -30,6 +34,8 @@ GameState* GameStateManager::enum_to_state(GameStates const state)
     return &game_over_;
   case GameStates::HighScores:
     return &high_score_;
+  case GameStates::Credits:
+    return &credits_;
   }
 }
 

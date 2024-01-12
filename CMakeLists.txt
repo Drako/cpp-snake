@@ -44,7 +44,7 @@ add_executable(Snake WIN32 MACOSX_BUNDLE
     game/PlayingState.cxx game/PlayingState.hxx
     game/GameOverState.cxx game/GameOverState.hxx
     game/HighScoreState.cxx game/HighScoreState.hxx
-    game/DummyState.cxx game/DummyState.hxx
+    game/CreditsState.cxx game/CreditsState.hxx
     game/AssetManager.cxx game/AssetManager.hxx
     game/ui/Button.cxx game/ui/Button.hxx
     game/ui/LineInput.cxx game/ui/LineInput.hxx
