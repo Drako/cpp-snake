@@ -28,6 +28,8 @@ GameState* GameStateManager::enum_to_state(GameStates const state)
     return &game_;
   case GameStates::GameOver:
     return &game_over_;
+  case GameStates::HighScores:
+    return &high_score_;
   }
 }
 

@@ -8,6 +8,7 @@
 #include "MenuState.hxx"
 #include "PlayingState.hxx"
 #include "GameOverState.hxx"
+#include "HighScoreState.hxx"
 #include "DummyState.hxx"
 
 #include <stack>
@@ -50,6 +51,7 @@ private:
   MenuState menu_;
   PlayingState game_;
   GameOverState game_over_;
+  HighScoreState high_score_;
   DummyState dummy_;
 };
 

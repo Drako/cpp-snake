@@ -77,6 +77,11 @@ bool HighScoreManager::has_new_score() const
   return new_score_.has_value();
 }
 
+unsigned HighScoreManager::get_new_score() const
+{
+  return new_score_.value_or(0u);
+}
+
 void HighScoreManager::provide_name_for_new_score(std::string const& name)
 {
   if (new_score_.has_value()) {
@@ -94,4 +99,9 @@ HighScoreManager& HighScoreManager::instance()
 {
   static HighScoreManager manager;
   return manager;
+}
+
+std::vector<Score> const& HighScoreManager::get_scores() const
+{
+  return high_score_.scores_;
 }

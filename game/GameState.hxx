@@ -25,7 +25,11 @@ public:
     (void) event;
   }
 
-  virtual void update(GameStateManager& gsm, std::chrono::milliseconds delta_time) = 0;
+  virtual void update(GameStateManager& gsm, std::chrono::milliseconds const delta_time)
+  {
+    (void) gsm;
+    (void) delta_time;
+  }
 
   virtual void render(SDLRenderer& renderer) = 0;
 };

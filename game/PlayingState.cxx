@@ -170,10 +170,8 @@ void PlayingState::render(SDLRenderer& renderer)
 
 void PlayingState::render_ui(SDLRenderer& renderer, SDL_Rect const& playing_field)
 {
-  TTF_Font* const font = font_;
-
   auto const score_text = std::format("Score: {}", length_);
-  SDL_Surface* text_surface = TTF_RenderText_Solid(font, score_text.c_str(), {255, 255, 255, SDL_ALPHA_OPAQUE});
+  SDL_Surface* text_surface = TTF_RenderText_Solid(font_, score_text.c_str(), {255, 255, 255, SDL_ALPHA_OPAQUE});
   SDL_Texture* text = SDL_CreateTextureFromSurface(renderer, text_surface);
   SDL_FreeSurface(text_surface);
   int text_width, text_height;

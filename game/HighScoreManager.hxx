@@ -47,9 +47,13 @@ public:
 
   [[nodiscard]] bool has_new_score() const;
 
+  [[nodiscard]] unsigned get_new_score() const;
+
   void provide_name_for_new_score(std::string const& name);
 
   static HighScoreManager& instance();
+
+  [[nodiscard]] std::vector<Score> const& get_scores() const;
 
 private:
   HighScoreManager();

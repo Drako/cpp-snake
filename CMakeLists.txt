@@ -43,13 +43,14 @@ add_executable(Snake WIN32
     game/SplashState.cxx game/SplashState.hxx
     game/MenuState.cxx game/MenuState.hxx
     game/PlayingState.cxx game/PlayingState.hxx
+    game/GameOverState.cxx game/GameOverState.hxx
+    game/HighScoreState.cxx game/HighScoreState.hxx
     game/DummyState.cxx game/DummyState.hxx
     game/AssetManager.cxx game/AssetManager.hxx
     game/ui/Button.cxx game/ui/Button.hxx
     game/ui/LineInput.cxx game/ui/LineInput.hxx
     game/ui/UiColor.hxx game/ui/UiColor.cxx
     game/HighScoreManager.cxx game/HighScoreManager.hxx
-    game/GameOverState.cxx game/GameOverState.hxx
 )
 
 target_link_libraries(Snake PRIVATE
