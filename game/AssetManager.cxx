@@ -2,7 +2,6 @@
 
 #include <cassert>
 #include <filesystem>
-#include <format>
 
 #include <SDL_image.h>
 
@@ -62,7 +61,7 @@ void AssetManager::load_assets(std::filesystem::path const& asset_directory)
     if (ext==".png" || ext==".jpg") {
       auto const surface = IMG_Load(path.c_str());
       if (surface==nullptr) {
-        throw SDLError{std::format("Failed to load texture {}.", path)};
+        throw SDLError{"Failed to load texture "+path+"."};
       }
       surface_assets_[filename] = surface;
       SDL_Log("Loaded texture %s successfully.", filename.c_str());
@@ -70,7 +69,7 @@ void AssetManager::load_assets(std::filesystem::path const& asset_directory)
     else if (ext==".ttf") {
       auto const font = TTF_OpenFont(path.c_str(), 42);
       if (font==nullptr) {
-        throw SDLError{std::format("Failed to load font {}.", path)};
+        throw SDLError{"Failed to load font "+path+"."};
       }
       font_assets_[filename] = font;
       SDL_Log("Loaded font %s successfully.", filename.c_str());

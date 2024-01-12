@@ -1,17 +1,24 @@
 #include "SDL.hxx"
 
 #include <cassert>
-#include <format>
+#include <sstream>
 
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 
-SDLError::SDLError(std::string_view const message, std::source_location location)
-    :std::runtime_error{std::format(
-    "{}:{}:{} - {} ({})",
-    location.file_name(), location.line(), location.column(),
-    message,
-    SDL_GetError())}
+namespace {
+  std::string build_error_message(std::string_view const message, std::source_location const location)
+  {
+    std::ostringstream strm;
+    strm << location.file_name() << ":" << location.line() << ":" << location.column();
+    strm << " - ";
+    strm << message << " (" << SDL_GetError() << ")";
+    return strm.str();
+  }
+}
+
+SDLError::SDLError(std::string_view const message, std::source_location const location)
+    :std::runtime_error{::build_error_message(message, location)}
 {
 }
 

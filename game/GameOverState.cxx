@@ -71,9 +71,9 @@ void GameOverState::render(SDLRenderer& renderer)
   int base_y;
   auto const& hsm = HighScoreManager::instance();
   if (hsm.has_new_score()) {
-    auto const score_text = std::format(
-        "Congratulations, you made it to the top 10!\nYou reached {} points!\nPlease enter your name:",
-        hsm.get_new_score());
+    auto const score_text = "Congratulations, you made it to the top 10!\nYou reached "
+        +std::to_string(hsm.get_new_score())
+        +" points!\nPlease enter your name:";
     SDL_Surface* text_surface = TTF_RenderText_Solid_Wrapped(font_, score_text.c_str(),
         {255, 255, 255, SDL_ALPHA_OPAQUE}, 0);
     SDL_Texture* text = SDL_CreateTextureFromSurface(renderer, text_surface);

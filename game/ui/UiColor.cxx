@@ -1,19 +1,29 @@
 #include "UiColor.hxx"
 
-#include <format>
+#include <sstream>
 
 std::string ui_image(std::string_view name, UiColor const color)
 {
+  std::ostringstream strm;
+
   switch (color) {
   case UiColor::Blue:
-    return std::format("blue_{}.png", name);
+    strm << "blue_";
+    break;
   case UiColor::Green:
-    return std::format("green_{}.png", name);
+    strm << "green_";
+    break;
   default:
-    return std::format("grey_{}.png", name);
+    strm << "grey_";
+    break;
   case UiColor::Red:
-    return std::format("red_{}.png", name);
+    strm << "red_";
+    break;
   case UiColor::Yellow:
-    return std::format("yellow_{}.png", name);
+    strm << "yellow_";
+    break;
   }
+
+  strm << name << ".png";
+  return strm.str();
 }
