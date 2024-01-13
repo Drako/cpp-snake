@@ -86,6 +86,22 @@ void LineInput::on_event(SDL_Event const& evt)
 
   if (evt.type==SDL_TEXTINPUT) {
     value_ += evt.text.text;
+    auto it = value_.begin();
+    auto const end = value_.end();
+    int len = 0;
+    // we assume valid UTF-8 here
+    while (it!=end && len<MAX_CHARACTERS) {
+      ++len;
+      if ((*it & 0x80)==0)
+        ++it;
+      else if ((*it & 0xE0)==0xC0)
+        std::advance(it, 2);
+      else if ((*it & 0xF0)==0xE0)
+        std::advance(it, 3);
+      else if ((*it & 0xF8)==0xF0)
+        std::advance(it, 4);
+    }
+    value_.erase(it, end);
   }
   else if (evt.type==SDL_KEYDOWN && evt.key.keysym.sym==SDLK_BACKSPACE) {
     if (!value_.empty()) {

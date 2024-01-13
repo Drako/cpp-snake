@@ -14,6 +14,8 @@ public:
   static int constexpr MIN_WIDTH = 16;
   static int constexpr MIN_HEIGHT = 15;
 
+  static int constexpr MAX_CHARACTERS = 40;
+
   LineInput(int x, int y, int w, int h, std::string value = "");
 
   void on_event(SDL_Event const& evt);

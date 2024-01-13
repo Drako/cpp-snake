@@ -19,16 +19,16 @@ AssetManager::AssetManager(SDLRenderer& renderer)
 
   auto const current_path = fs::current_path();
   std::array const asset_paths{
-    current_path/"assets",
-    current_path.parent_path()/"assets",
-    current_path.parent_path()/"Resources"/"assets", // MacOS bundle
-    INSTALLED_ASSETS_PATH,
+      current_path/"assets",
+      current_path.parent_path()/"assets",
+      current_path.parent_path()/"Resources"/"assets", // MacOS bundle
+      INSTALLED_ASSETS_PATH,
   };
 
-  auto const it = std::ranges::find_if(asset_paths, [](fs::path const& p){
+  auto const it = std::ranges::find_if(asset_paths, [](fs::path const& p) {
     return fs::exists(p);
   });
-  if (it == std::end(asset_paths)) {
+  if (it==std::end(asset_paths)) {
     throw std::runtime_error("Assets directory not found.");
   }
 
