@@ -52,9 +52,13 @@ add_executable(Snake WIN32 MACOSX_BUNDLE
     game/HighScoreManager.cxx game/HighScoreManager.hxx
 )
 
+file(GLOB assets assets/*)
+target_sources(Snake PRIVATE ${assets})
+set_source_files_properties(${assets} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/assets)
+
 target_link_libraries(Snake PRIVATE
-    SDL2::SDL2-static SDL2::SDL2main
-    SDL2_image::SDL2_image-static
-    SDL2_ttf::SDL2_ttf-static
+    SDL2::SDL2 SDL2::SDL2main
+    SDL2_image::SDL2_image
+    SDL2_ttf::SDL2_ttf
     Boost::headers Boost::serialization Boost::program_options
 )

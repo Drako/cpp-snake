@@ -1,5 +1,7 @@
 #include "AssetManager.hxx"
 
+#include <algorithm>
+#include <array>
 #include <cassert>
 #include <filesystem>
 
@@ -15,16 +17,20 @@ AssetManager::AssetManager(SDLRenderer& renderer)
   assert(instance_==nullptr);
 
   auto const current_path = fs::current_path();
-  auto const asset_directory =
-      fs::exists(current_path/"assets")
-      ? current_path/"assets"
-      : fs::exists(current_path.parent_path()/"assets")
-        ? current_path.parent_path()/"assets"
-        : fs::path{};
-  if (asset_directory.empty()) {
+  std::array const asset_paths{
+    current_path/"assets",
+    current_path.parent_path()/"assets",
+    current_path.parent_path()/"Resources"/"assets", // MacOS bundle
+  };
+
+  auto const it = std::ranges::find_if(asset_paths, [](fs::path const& p){
+    return fs::exists(p);
+  });
+  if (it == std::end(asset_paths)) {
     throw std::runtime_error("Assets directory not found.");
   }
 
+  auto const asset_directory = *it;
   total_assets_ = std::distance(fs::directory_iterator(asset_directory),
       fs::directory_iterator());
 
