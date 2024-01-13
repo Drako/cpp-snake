@@ -1,0 +1,11 @@
+#pragma once
+
+#ifndef SNAKE_CONFIG_HXX
+#define SNAKE_CONFIG_HXX
+
+#include <filesystem>
+
+static std::filesystem::path const INSTALLED_ASSETS_PATH =
+    std::filesystem::path{"@CMAKE_INSTALL_PREFIX@"}/"share"/"snake"/"assets";
+
+#endif // SNAKE_CONFIG_HXX

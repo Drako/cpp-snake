@@ -1,4 +1,5 @@
 #include "AssetManager.hxx"
+#include "Config.hxx"
 
 #include <algorithm>
 #include <array>
@@ -21,6 +22,7 @@ AssetManager::AssetManager(SDLRenderer& renderer)
     current_path/"assets",
     current_path.parent_path()/"assets",
     current_path.parent_path()/"Resources"/"assets", // MacOS bundle
+    INSTALLED_ASSETS_PATH,
   };
 
   auto const it = std::ranges::find_if(asset_paths, [](fs::path const& p){
@@ -31,6 +33,7 @@ AssetManager::AssetManager(SDLRenderer& renderer)
   }
 
   auto const asset_directory = *it;
+  SDL_Log("Loading assets from %s.", asset_directory.c_str());
   total_assets_ = std::distance(fs::directory_iterator(asset_directory),
       fs::directory_iterator());
 
