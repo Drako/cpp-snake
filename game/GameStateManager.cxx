@@ -21,7 +21,7 @@ GameState* GameStateManager::enum_to_state(GameStates const state)
   default:
     // this should no longer be reachable as all states are handled
     assert(false);
-    break;
+    return nullptr;
   case GameStates::Loading:
     return &loading_;
   case GameStates::Splash:
