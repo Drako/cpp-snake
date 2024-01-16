@@ -71,6 +71,10 @@ add_executable(Snake WIN32 MACOSX_BUNDLE
 file(GLOB assets assets/*)
 target_sources(Snake PRIVATE ${assets})
 
+if (WIN32)
+  target_sources(Snake PRIVATE windows-resources.rc)
+endif (WIN32)
+
 set_target_properties(Snake PROPERTIES
     RUNTIME_OUTPUT_NAME snake
 )

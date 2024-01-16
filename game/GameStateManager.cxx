@@ -2,8 +2,8 @@
 
 #include <cassert>
 
-GameStateManager::GameStateManager()
-    :states_{{GameStates::Loading}}
+GameStateManager::GameStateManager(SDLWindow& window)
+    :window_{window}, states_{{GameStates::Loading}}
 {
   loading_.on_enter(*this);
 }

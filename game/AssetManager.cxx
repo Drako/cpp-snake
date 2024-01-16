@@ -102,12 +102,15 @@ SDL_Texture* AssetManager::get_texture_asset(std::string const& filepath)
 
     auto const texture = SDL_CreateTextureFromSurface(renderer_, surf_it->second);
     texture_assets_[filepath] = texture;
-    SDL_FreeSurface(surf_it->second);
-    surface_assets_.erase(surf_it);
 
     return texture;
   }
   return it->second;
+}
+
+SDL_Surface* AssetManager::get_surface_asset(std::string const& filepath)
+{
+  return surface_assets_[filepath];
 }
 
 TTF_Font* AssetManager::get_font_asset(std::string const& filepath)

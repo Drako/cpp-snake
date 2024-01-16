@@ -80,8 +80,10 @@ void SplashState::render(SDLRenderer& renderer)
 
 void SplashState::on_enter(GameStateManager& gsm)
 {
-  (void) gsm;
+  auto& am = AssetManager::instance();
   time_in_state_ = 0ms;
-  logo_ = AssetManager::instance().get_texture_asset("logo.jpg");
+  logo_ = am.get_texture_asset("logo.jpg");
   SDL_SetTextureBlendMode(logo_, SDL_BLENDMODE_BLEND);
+
+  SDL_SetWindowIcon(gsm.window(), am.get_surface_asset("snake-icon.png"));
 }

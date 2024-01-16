@@ -7,12 +7,12 @@
 
 #include <cstdlib>
 
-void main_loop(SDLRenderer& renderer)
+void main_loop(SDLWindow& window, SDLRenderer& renderer)
 {
   using namespace std::chrono;
 
   AssetManager am{renderer};
-  GameStateManager gsm{};
+  GameStateManager gsm{window};
 
   auto start = high_resolution_clock::now();
   for (;;) {
@@ -31,12 +31,12 @@ void main_loop(SDLRenderer& renderer)
     auto const delta_time = duration_cast<milliseconds>(end-start);
     start = end;
 
-    if (auto const state = gsm.current(); state != nullptr)
+    if (auto const state = gsm.current(); state!=nullptr)
       state->update(gsm, delta_time);
     else
       return;
 
-    if (auto const state = gsm.current(); state != nullptr)
+    if (auto const state = gsm.current(); state!=nullptr)
       state->render(renderer);
     else
       return;
@@ -54,7 +54,7 @@ int main(int argc, char** argv) try
   };
   SDLRenderer renderer{window};
 
-  main_loop(renderer);
+  main_loop(window, renderer);
   return EXIT_SUCCESS;
 } catch (std::exception const& ex) {
   SDL_LogError(SDL_LOG_CATEGORY_ERROR, "%s", ex.what());

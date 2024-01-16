@@ -15,6 +15,8 @@
 
 #include <boost/noncopyable.hpp>
 
+class SDLWindow;
+
 enum class GameStates {
   Loading,
   Splash,
@@ -27,7 +29,7 @@ enum class GameStates {
 
 class GameStateManager final : private boost::noncopyable {
 public:
-  GameStateManager();
+  explicit GameStateManager(SDLWindow& window);
 
   ~GameStateManager();
 
@@ -41,7 +43,13 @@ public:
 
   void replace_state(GameStates new_state);
 
+  SDLWindow& window()
+  {
+    return window_;
+  }
+
 private:
+  SDLWindow& window_;
   std::stack<GameStates> states_;
 
   GameState* enum_to_state(GameStates state);

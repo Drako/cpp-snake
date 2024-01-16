@@ -28,6 +28,8 @@ public:
 
   SDL_Texture* get_texture_asset(std::string const& filepath);
 
+  SDL_Surface* get_surface_asset(std::string const& filepath);
+
   TTF_Font* get_font_asset(std::string const& filepath);
 
 private:
