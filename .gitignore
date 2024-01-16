@@ -3,7 +3,7 @@
 !.idea/codeStyles/
 
 # CMake
-cmake*/
+*build*/
 
 # MacOS
 .DS_Store
