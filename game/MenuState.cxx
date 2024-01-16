@@ -1,6 +1,7 @@
 #include "MenuState.hxx"
 #include "PlayingState.hxx"
 #include "GameStateManager.hxx"
+#include "TranslationManager.hxx"
 #include "../SDLRenderer.hxx"
 
 #include <array>
@@ -8,6 +9,13 @@
 void MenuState::on_enter(GameStateManager& gsm)
 {
   active_button_ = 0;
+
+  auto const& tm = TranslationManager::instance();
+  new_game_button_.set_title(tm.get_translation("New game"));
+  continue_button_.set_title(tm.get_translation("Continue"));
+  high_score_button_.set_title(tm.get_translation("High Scores"));
+  credits_button_.set_title(tm.get_translation("Credits"));
+  quit_button_.set_title(tm.get_translation("Quit"));
 
   game_.reset();
   if (auto const parent = gsm.parent(); parent!=nullptr) {

@@ -23,7 +23,7 @@ public:
   void render(SDLRenderer& renderer) override;
 
 private:
-  Button ok_button_{"OK", 0, 0, 800, 80, UiColor::Green};
+  Button ok_button_{0, 0, 800, 80, UiColor::Green};
   LineInput name_input_{0, 0, 800, 80};
 
   Asset<TTF_Font*> font_;

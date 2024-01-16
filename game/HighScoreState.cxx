@@ -2,6 +2,7 @@
 
 #include "HighScoreManager.hxx"
 #include "GameStateManager.hxx"
+#include "TranslationManager.hxx"
 #include "../SDLRenderer.hxx"
 
 HighScoreState::HighScoreState()
@@ -43,7 +44,7 @@ void HighScoreState::render(SDLRenderer& renderer)
   auto const scores = HighScoreManager::instance().get_scores();
   for (auto const& score: scores) {
     std::string text = score.player_name_+": "+std::to_string(score.points_);
-    SDL_Surface* surface = TTF_RenderText_Solid(font, text.c_str(), color);
+    SDL_Surface* surface = TTF_RenderUTF8_Solid(font, text.c_str(), color);
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
 
     SDL_Rect textRect;
@@ -65,8 +66,8 @@ void HighScoreState::render(SDLRenderer& renderer)
 
 void HighScoreState::render_heading(SDLRenderer& renderer, int const width, SDL_Color const& color, int& current_height)
 {
-  std::string heading = "High Scores";
-  SDL_Surface* headingSurface = TTF_RenderText_Solid(font_, "High Scores", color);
+  SDL_Surface* headingSurface = TTF_RenderUTF8_Solid(font_,
+      TranslationManager::instance().get_translation("High Scores").c_str(), color);
   SDL_Texture* headingTexture = SDL_CreateTextureFromSurface(renderer, headingSurface);
 
   SDL_Rect heading_rect;

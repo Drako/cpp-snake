@@ -2,6 +2,7 @@
 
 #include "HighScoreManager.hxx"
 #include "GameStateManager.hxx"
+#include "TranslationManager.hxx"
 
 #include <algorithm>
 #include <cfenv>
@@ -167,8 +168,10 @@ void PlayingState::render(SDLRenderer& renderer)
 
 void PlayingState::render_ui(SDLRenderer& renderer, SDL_Rect const& playing_field)
 {
-  auto const score_text = "Score: "+std::to_string(length_);
-  SDL_Surface* text_surface = TTF_RenderText_Solid(font_, score_text.c_str(), {255, 255, 255, SDL_ALPHA_OPAQUE});
+  auto const& tm = TranslationManager::instance();
+
+  auto const score_text = tm.get_translation("Score")+": "+std::to_string(length_);
+  SDL_Surface* text_surface = TTF_RenderUTF8_Solid(font_, score_text.c_str(), {255, 255, 255, SDL_ALPHA_OPAQUE});
   SDL_Texture* text = SDL_CreateTextureFromSurface(renderer, text_surface);
   SDL_FreeSurface(text_surface);
   int text_width, text_height;
@@ -177,8 +180,8 @@ void PlayingState::render_ui(SDLRenderer& renderer, SDL_Rect const& playing_fiel
   SDL_RenderCopy(renderer, text, nullptr, &render_quad);
   SDL_DestroyTexture(text);
 
-  auto const fps_text = "Frames per second: "+std::to_string(fps_);
-  text_surface = TTF_RenderText_Solid(font_, fps_text.c_str(), {255, 255, 255, SDL_ALPHA_OPAQUE});
+  auto const fps_text = tm.get_translation("Frames per second")+": "+std::to_string(fps_);
+  text_surface = TTF_RenderUTF8_Solid(font_, fps_text.c_str(), {255, 255, 255, SDL_ALPHA_OPAQUE});
   text = SDL_CreateTextureFromSurface(renderer, text_surface);
   SDL_FreeSurface(text_surface);
   SDL_QueryTexture(text, nullptr, nullptr, &text_width, &text_height);

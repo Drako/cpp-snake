@@ -56,6 +56,7 @@ add_executable(Snake WIN32 MACOSX_BUNDLE
     game/ui/UiColor.hxx game/ui/UiColor.cxx
     game/HighScoreManager.cxx game/HighScoreManager.hxx
     ${CMAKE_CURRENT_BINARY_DIR}/Config.hxx
+    game/TranslationManager.cxx game/TranslationManager.hxx
     NonCopyable.hxx
 )
 

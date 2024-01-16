@@ -1,8 +1,14 @@
 #include "GameOverState.hxx"
 #include "GameStateManager.hxx"
-
+#include "TranslationManager.hxx"
 #include "HighScoreManager.hxx"
 #include "../SDLRenderer.hxx"
+
+#include <regex>
+
+namespace {
+  std::regex const PLACEHOLDER_REGEX{R"(\{\})"};
+}
 
 GameOverState::GameOverState()
     :font_{"kenney_pixel.ttf"}
@@ -13,6 +19,7 @@ void GameOverState::on_enter(GameStateManager& gsm)
 {
   SDL_ShowCursor(SDL_ENABLE);
 
+  ok_button_.set_title(TranslationManager::instance().get_translation("OK"));
   if (HighScoreManager::instance().has_new_score()) {
     name_input_.set_focus(true);
     name_input_.set_value("Anon");
@@ -62,6 +69,8 @@ void GameOverState::update(GameStateManager& gsm, std::chrono::milliseconds cons
 
 void GameOverState::render(SDLRenderer& renderer)
 {
+  auto const& tm = TranslationManager::instance();
+
   int width, height;
   SDL_GetRendererOutputSize(renderer, &width, &height);
 
@@ -71,10 +80,10 @@ void GameOverState::render(SDLRenderer& renderer)
   int base_y;
   auto const& hsm = HighScoreManager::instance();
   if (hsm.has_new_score()) {
-    auto const score_text = "Congratulations, you made it to the top 10!\nYou reached "
-        +std::to_string(hsm.get_new_score())
-        +" points!\nPlease enter your name:";
-    SDL_Surface* text_surface = TTF_RenderText_Solid_Wrapped(font_, score_text.c_str(),
+    auto score_text = (tm.get_translation("Congratulations, you made it to the top 10!")
+        +"\n"+tm.get_translation("You reached {} points!")+"\n"+tm.get_translation("Please enter your name:"));
+    score_text = std::regex_replace(score_text, PLACEHOLDER_REGEX, std::to_string(hsm.get_new_score()));
+    SDL_Surface* text_surface = TTF_RenderUTF8_Solid_Wrapped(font_, score_text.c_str(),
         {255, 255, 255, SDL_ALPHA_OPAQUE}, 0);
     SDL_Texture* text = SDL_CreateTextureFromSurface(renderer, text_surface);
     SDL_FreeSurface(text_surface);
@@ -95,7 +104,8 @@ void GameOverState::render(SDLRenderer& renderer)
     base_y += name_input_.get_bounding_box().h+10;
   }
   else {
-    SDL_Surface* text_surface = TTF_RenderText_Solid(font_, "Game over!", {255, 255, 255, SDL_ALPHA_OPAQUE});
+    SDL_Surface* text_surface = TTF_RenderUTF8_Solid(font_, tm.get_translation("Game over!").c_str(),
+        {255, 255, 255, SDL_ALPHA_OPAQUE});
     SDL_Texture* text = SDL_CreateTextureFromSurface(renderer, text_surface);
     SDL_FreeSurface(text_surface);
     int text_width, text_height;

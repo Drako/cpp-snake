@@ -1,5 +1,6 @@
 #include "AssetManager.hxx"
 #include "Config.hxx"
+#include "TranslationManager.hxx"
 
 #include <algorithm>
 #include <array>
@@ -82,6 +83,10 @@ void AssetManager::load_assets(std::filesystem::path const& asset_directory)
       }
       font_assets_[filename] = font;
       SDL_Log("Loaded font %s successfully.", filename.c_str());
+    }
+    else if (ext==".ini") {
+      TranslationManager::instance().load(path);
+      SDL_Log("Loaded translations from %s.", filename.c_str());
     }
     ++assets_loaded_;
   }

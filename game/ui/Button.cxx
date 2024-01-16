@@ -56,8 +56,8 @@ namespace {
   }
 }
 
-Button::Button(std::string title, int const x, int const y, int const w, int const h, UiColor const color)
-    :title_{std::move(title)}, x_{x}, y_{y}, w_{w}, h_{h}, pressed_{false},
+Button::Button(int const x, int const y, int const w, int const h, UiColor const color)
+    :x_{x}, y_{y}, w_{w}, h_{h}, pressed_{false},
      visible_{true},
      up_{ui_image("button_up", color)},
      down_{ui_image("button_down", color)},
@@ -67,6 +67,16 @@ Button::Button(std::string title, int const x, int const y, int const w, int con
   assert(h_>=MIN_HEIGHT);
 
   on_click_ = [] { };
+}
+
+void Button::set_title(std::string const& title)
+{
+  title_ = title;
+}
+
+std::string const& Button::title() const
+{
+  return title_;
 }
 
 void Button::set_pressed(bool const pressed)

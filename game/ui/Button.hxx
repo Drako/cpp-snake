@@ -19,7 +19,11 @@ public:
   static int constexpr MIN_WIDTH = 12;
   static int constexpr MIN_HEIGHT = 14;
 
-  Button(std::string title, int x, int y, int w, int h, UiColor color = UiColor::Grey);
+  Button(int x, int y, int w, int h, UiColor color = UiColor::Grey);
+
+  void set_title(std::string const& title);
+
+  [[nodiscard]] std::string const& title() const;
 
   void set_pressed(bool pressed);
 
@@ -44,7 +48,7 @@ public:
   [[nodiscard]] SDL_Rect get_bounding_box() const;
 
 private:
-  std::string title_;
+  std::string title_{};
   int x_, y_, w_, h_;
   bool pressed_;
   bool visible_;
