@@ -13,9 +13,9 @@
 
 #include <SDL_ttf.h>
 
-#include <boost/noncopyable.hpp>
+#include "../NonCopyable.hxx"
 
-class AssetManager final : private boost::noncopyable {
+class AssetManager final : private NonCopyable {
 
 public:
   explicit AssetManager(SDLRenderer& renderer);

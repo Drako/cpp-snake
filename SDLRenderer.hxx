@@ -5,9 +5,9 @@
 
 #include "SDLWindow.hxx"
 
-#include <boost/noncopyable.hpp>
+#include "NonCopyable.hxx"
 
-class SDLRenderer final : private boost::noncopyable {
+class SDLRenderer final : private NonCopyable {
 public:
   explicit SDLRenderer(SDLWindow& window);
 

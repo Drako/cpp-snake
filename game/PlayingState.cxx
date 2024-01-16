@@ -9,17 +9,14 @@
 #include <random>
 #include <unordered_set>
 
-#include <boost/functional/hash.hpp>
-
 namespace std {
   template<>
   struct hash<SDL_Point> {
     std::size_t operator()(SDL_Point const& p) const noexcept
     {
-      std::size_t seed{0u};
-      boost::hash_combine(seed, p.x);
-      boost::hash_combine(seed, p.y);
-      return seed;
+      static_assert(sizeof(std::size_t)==8u);
+      static_assert(sizeof(int)==4u);
+      return (static_cast<std::size_t>(p.x) << 32u) | static_cast<std::size_t>(p.y);
     }
   };
 }

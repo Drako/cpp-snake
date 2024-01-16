@@ -5,11 +5,11 @@
 
 #include <chrono>
 
-#include <boost/noncopyable.hpp>
+#include "../../NonCopyable.hxx"
 
 #include "../AssetManager.hxx"
 
-class LineInput final : private boost::noncopyable {
+class LineInput final : private NonCopyable {
 public:
   static int constexpr MIN_WIDTH = 16;
   static int constexpr MIN_HEIGHT = 15;

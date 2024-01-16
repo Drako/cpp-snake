@@ -3,11 +3,7 @@
 #ifndef SNAKE_HIGHSCOREMANAGER_HXX
 #define SNAKE_HIGHSCOREMANAGER_HXX
 
-#include <boost/noncopyable.hpp>
-
-#include <boost/serialization/string.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/version.hpp>
+#include "../NonCopyable.hxx"
 
 #include <optional>
 #include <string>
@@ -16,30 +12,13 @@
 struct Score final {
   std::string player_name_;
   unsigned points_;
-
-  template<typename Archive>
-  void serialize(Archive& archive, unsigned const version)
-  {
-    (void) version;
-    archive & player_name_;
-    archive & points_;
-  }
 };
-BOOST_CLASS_VERSION(Score, 0);
 
 struct HighScores final {
   std::vector<Score> scores_;
-
-  template<typename Archive>
-  void serialize(Archive& archive, unsigned const version)
-  {
-    (void) version;
-    archive & scores_;
-  }
 };
-BOOST_CLASS_VERSION(HighScores, 0);
 
-class HighScoreManager final : private boost::noncopyable {
+class HighScoreManager final : private NonCopyable {
 public:
   static int constexpr MAX_SCORES = 10;
 

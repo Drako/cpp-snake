@@ -30,16 +30,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(SDL2 SDL2_image SDL2_ttf)
 
-set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_LIBS ON)
-set(Boost_USE_STATIC_RUNTIME OFF)
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-  set(Boost_USE_DEBUG_LIBS ON)
-else ()
-  set(Boost_USE_DEBUG_LIBS OFF)
-endif ()
-find_package(Boost 1.74.0 REQUIRED COMPONENTS serialization program_options)
-
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/Config.hxx.in
     ${CMAKE_CURRENT_BINARY_DIR}/Config.hxx
@@ -66,6 +56,7 @@ add_executable(Snake WIN32 MACOSX_BUNDLE
     game/ui/UiColor.hxx game/ui/UiColor.cxx
     game/HighScoreManager.cxx game/HighScoreManager.hxx
     ${CMAKE_CURRENT_BINARY_DIR}/Config.hxx
+    NonCopyable.hxx
 )
 
 file(GLOB assets assets/*)
@@ -82,7 +73,6 @@ target_link_libraries(Snake PRIVATE
     SDL2::SDL2 SDL2::SDL2main
     SDL2_image::SDL2_image
     SDL2_ttf::SDL2_ttf
-    Boost::headers Boost::serialization Boost::program_options
 )
 
 if (WIN32)

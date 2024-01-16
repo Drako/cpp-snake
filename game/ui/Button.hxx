@@ -9,12 +9,12 @@
 #include <functional>
 #include <string>
 
-#include <boost/noncopyable.hpp>
+#include "../../NonCopyable.hxx"
 
 #include "UiColor.hxx"
 #include "../AssetManager.hxx"
 
-class Button final : private boost::noncopyable {
+class Button final : private NonCopyable {
 public:
   static int constexpr MIN_WIDTH = 12;
   static int constexpr MIN_HEIGHT = 14;

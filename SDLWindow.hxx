@@ -7,9 +7,9 @@
 
 #include <string_view>
 
-#include <boost/noncopyable.hpp>
+#include "NonCopyable.hxx"
 
-class SDLWindow final : private boost::noncopyable {
+class SDLWindow final : private NonCopyable {
 public:
   SDLWindow(std::string_view title, int x, int y, int w, int h, std::uint32_t flags = 0u);
 

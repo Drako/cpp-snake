@@ -2,12 +2,10 @@
 
 #include <SDL.h>
 
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/archive/binary_oarchive.hpp>
-
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
+#include <numeric>
 
 namespace fs = std::filesystem;
 
@@ -28,8 +26,16 @@ void HighScoreManager::load()
     return;
   }
 
-  boost::archive::binary_iarchive archive{input};
-  archive >> high_score_;
+  std::size_t count;
+  input.read(std::bit_cast<char*>(&count), sizeof(std::size_t));
+  high_score_.scores_.resize(count);
+  for (std::size_t n = 0; n<count; ++n) {
+    std::size_t len;
+    input.read(std::bit_cast<char*>(&len), sizeof(std::size_t));
+    high_score_.scores_[n].player_name_.resize(len);
+    input.read(high_score_.scores_[n].player_name_.data(), static_cast<std::streamsize>(len));
+    input.read(std::bit_cast<char*>(&(high_score_.scores_[n].points_)), sizeof(unsigned));
+  }
   std::ranges::stable_sort(high_score_.scores_, std::greater<>{}, &Score::points_);
 
   if (high_score_.scores_.empty()) {
@@ -52,8 +58,14 @@ void HighScoreManager::save() const
     return;
   }
 
-  boost::archive::binary_oarchive archive{output};
-  archive << high_score_;
+  auto const count = high_score_.scores_.size();
+  output.write(std::bit_cast<char const*>(&count), sizeof(std::size_t));
+  for (auto const& score: high_score_.scores_) {
+    auto const len = score.player_name_.length();
+    output.write(std::bit_cast<char const*>(&len), sizeof(std::size_t));
+    output.write(score.player_name_.data(), static_cast<std::streamsize>(score.player_name_.length()));
+    output.write(std::bit_cast<char const*>(&score.points_), sizeof(unsigned));
+  }
   if (high_score_.scores_.empty()) {
     SDL_Log("No high scores saved.");
   }

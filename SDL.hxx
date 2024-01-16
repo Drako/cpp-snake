@@ -10,7 +10,7 @@
 #include <stdexcept>
 #include <string_view>
 
-#include <boost/noncopyable.hpp>
+#include "NonCopyable.hxx"
 
 /**
  * @class SDLError
@@ -35,7 +35,7 @@ public:
  * This class provides a convenient way to initialize SDL and clean up resources when they are no longer needed.
  * Only one instance of this class can exist at a time.
  */
-class SDL final : private boost::noncopyable {
+class SDL final : private NonCopyable {
 public:
   explicit SDL(std::uint32_t flags = SDL_INIT_EVERYTHING);
 

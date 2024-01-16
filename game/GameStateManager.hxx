@@ -13,7 +13,7 @@
 
 #include <stack>
 
-#include <boost/noncopyable.hpp>
+#include "../NonCopyable.hxx"
 
 class SDLWindow;
 
@@ -27,7 +27,7 @@ enum class GameStates {
   Credits,
 };
 
-class GameStateManager final : private boost::noncopyable {
+class GameStateManager final : private NonCopyable {
 public:
   explicit GameStateManager(SDLWindow& window);
 
