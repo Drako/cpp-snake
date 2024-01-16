@@ -32,8 +32,8 @@ AssetManager::AssetManager(SDLRenderer& renderer)
     throw std::runtime_error("Assets directory not found.");
   }
 
-  auto const asset_directory = *it;
-  SDL_Log("Loading assets from %s.", asset_directory.c_str());
+  auto const& asset_directory = *it;
+  SDL_Log("Loading assets from %s.", asset_directory.string().c_str());
   total_assets_ = std::distance(fs::directory_iterator(asset_directory),
       fs::directory_iterator());
 
