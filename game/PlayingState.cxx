@@ -8,19 +8,6 @@
 #include <cfenv>
 #include <cmath>
 #include <random>
-#include <unordered_set>
-
-namespace std {
-  template<>
-  struct hash<SDL_Point> {
-    std::size_t operator()(SDL_Point const& p) const noexcept
-    {
-      static_assert(sizeof(std::size_t)==8u);
-      static_assert(sizeof(int)==4u);
-      return (static_cast<std::size_t>(p.x) << 32u) | static_cast<std::size_t>(p.y);
-    }
-  };
-}
 
 namespace {
   SDL_Point head_position(SDL_FPoint const& position)
@@ -131,7 +118,8 @@ void PlayingState::update(GameStateManager& gsm, std::chrono::milliseconds const
       gsm.replace_state(GameStates::GameOver);
     }
 
-    if (new_pos==target_) {
+    if (target_.contains(new_pos)) {
+      target_.erase(new_pos);
       ++length_;
       speed_ = std::min(MAX_SPEED, speed_*ACCELERATION);
       if (!place_target()) {
@@ -231,10 +219,9 @@ bool PlayingState::place_target()
     return false;
   }
 
-  std::vector<SDL_Point> result;
-  std::ranges::sample(field, std::back_inserter(result), 1, generator_);
-
-  target_ = result[0];
+  auto const wanted_targets = distribution_num_targets(generator_);
+  std::ranges::sample(field, std::inserter(target_, target_.end()),
+      std::max(static_cast<long long>(wanted_targets-target_.size()), 0ll), generator_);
   deadly_wall_ = distribution_deadly_wall(generator_)!=0;
 
   return true;
@@ -256,15 +243,18 @@ void PlayingState::place_head()
 void PlayingState::render_target(SDLRenderer& renderer, SDL_Rect const& playing_field)
 {
   auto const ratio = playing_field.w/static_cast<double>(CELLS_X);
-  SDL_Rect const target_rect{
-      .x = static_cast<int>(playing_field.x+ratio*target_.x),
-      .y = static_cast<int>(playing_field.y+ratio*target_.y),
-      .w = static_cast<int>(ratio),
-      .h = static_cast<int>(ratio),
-  };
 
   SDL_SetRenderDrawColor(renderer, 76, 208, 45, SDL_ALPHA_OPAQUE);
-  SDL_RenderFillRect(renderer, &target_rect);
+  for (auto const& target: target_) {
+    SDL_Rect const target_rect{
+        .x = static_cast<int>(playing_field.x+ratio*target.x),
+        .y = static_cast<int>(playing_field.y+ratio*target.y),
+        .w = static_cast<int>(ratio),
+        .h = static_cast<int>(ratio),
+    };
+
+    SDL_RenderFillRect(renderer, &target_rect);
+  }
 }
 
 void PlayingState::render_snake(SDLRenderer& renderer, SDL_Rect const& playing_field)

@@ -9,6 +9,19 @@
 #include <deque>
 #include <optional>
 #include <random>
+#include <unordered_set>
+
+namespace std {
+  template<>
+  struct hash<SDL_Point> {
+    std::size_t operator()(SDL_Point const& p) const noexcept
+    {
+      static_assert(sizeof(std::size_t)==8u);
+      static_assert(sizeof(int)==4u);
+      return (static_cast<std::size_t>(p.x) << 32u) | static_cast<std::size_t>(p.y);
+    }
+  };
+}
 
 enum class Direction {
   Up,
@@ -58,8 +71,9 @@ private:
   std::uniform_int_distribution<int> distribution_position_x_{0, CELLS_X-1};
   std::uniform_int_distribution<int> distribution_position_y_{0, CELLS_Y-1};
   std::discrete_distribution<int> distribution_deadly_wall{{5, 95}};
+  std::discrete_distribution<std::size_t> distribution_num_targets{{0, 90, 9, 1}};
 
-  SDL_Point target_{};
+  std::unordered_set<SDL_Point> target_{};
   unsigned length_{0u};
   Direction direction_{Direction::Left};
   std::optional<Direction> new_direction_{};
