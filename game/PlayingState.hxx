@@ -34,10 +34,10 @@ class PlayingState final : public GameState {
 public:
   static int constexpr CELLS_X = 64;
   static int constexpr CELLS_Y = 48;
-  static float constexpr ACCELERATION = 1.05f;
+  static float constexpr ACCELERATION = 1.02f;
   static float constexpr MAX_DISTANCE = 1.0f; // one cell per cycle
-  static float constexpr START_SPEED = 0.005f; // 5 cell per second
-  static float constexpr MAX_SPEED = 0.01f; // 20 cells per second
+  static float constexpr START_SPEED = 0.005f; // 5 cells per second
+  static float constexpr MAX_SPEED = 0.015f; // 15 cells per second
 
   PlayingState();
 
@@ -70,8 +70,8 @@ private:
   std::mt19937 generator_;
   std::uniform_int_distribution<int> distribution_position_x_{0, CELLS_X-1};
   std::uniform_int_distribution<int> distribution_position_y_{0, CELLS_Y-1};
-  std::discrete_distribution<int> distribution_deadly_wall{{5, 95}};
-  std::discrete_distribution<std::size_t> distribution_num_targets{{0, 90, 9, 1}};
+  std::discrete_distribution<int> distribution_deadly_wall{{10, 90}};
+  std::discrete_distribution<std::size_t> distribution_num_targets{{0, 75, 20, 5}};
 
   std::unordered_set<SDL_Point> target_{};
   unsigned length_{0u};
