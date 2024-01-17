@@ -17,7 +17,7 @@ public:
 private:
   Asset<TTF_Font*> font_;
 
-  void render_heading(SDLRenderer& renderer, int width, SDL_Color const& color, int& current_height);
+  void render_heading(SDLRenderer& renderer, int width, SDL_Color const& color);
 };
 
 #endif // SNAKE_HIGHSCORESTATE_HXX

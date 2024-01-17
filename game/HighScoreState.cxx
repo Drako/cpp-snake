@@ -38,12 +38,14 @@ void HighScoreState::render(SDLRenderer& renderer)
 
   SDL_Color const color = {255, 255, 255, SDL_ALPHA_OPAQUE};
 
-  int current_height = 80;
-  render_heading(renderer, width, color, current_height);
+  render_heading(renderer, width, color);
 
   auto const scores = HighScoreManager::instance().get_scores();
-  for (auto const& score: scores) {
-    std::string text = score.player_name_+": "+std::to_string(score.points_);
+  for (auto n = scores.size(); n--;) {
+    auto const current_height = 180+static_cast<int>(n)*50;
+    auto const& score = scores[n];
+
+    std::string const text = std::to_string(n+1)+" - "+score.player_name_+": "+std::to_string(score.points_);
     SDL_Surface* surface = TTF_RenderUTF8_Solid(font, text.c_str(), color);
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
 
@@ -57,14 +59,12 @@ void HighScoreState::render(SDLRenderer& renderer)
 
     SDL_FreeSurface(surface);
     SDL_DestroyTexture(texture);
-
-    current_height += textRect.h;
   }
 
   SDL_RenderPresent(renderer);
 }
 
-void HighScoreState::render_heading(SDLRenderer& renderer, int const width, SDL_Color const& color, int& current_height)
+void HighScoreState::render_heading(SDLRenderer& renderer, int const width, SDL_Color const& color)
 {
   SDL_Surface* headingSurface = TTF_RenderUTF8_Solid(font_,
       TranslationManager::instance().get_translation("High Scores").c_str(), color);
@@ -74,12 +74,10 @@ void HighScoreState::render_heading(SDLRenderer& renderer, int const width, SDL_
   heading_rect.w = headingSurface->w*2;
   heading_rect.h = headingSurface->h*2;
   heading_rect.x = (width-heading_rect.w)/2;
-  heading_rect.y = current_height;
+  heading_rect.y = 80;
 
   SDL_RenderCopy(renderer, headingTexture, nullptr, &heading_rect);
 
   SDL_FreeSurface(headingSurface);
   SDL_DestroyTexture(headingTexture);
-
-  current_height += heading_rect.h;
 }

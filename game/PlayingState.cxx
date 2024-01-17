@@ -7,17 +7,53 @@
 #include <algorithm>
 #include <cfenv>
 #include <cmath>
+#include <iterator>
 #include <random>
 
 namespace {
   SDL_Point head_position(SDL_FPoint const& position)
   {
+#ifndef _MSC_VER
 #pragma STDC FENV_ACCESS ON
+#endif // !_MSC_VER
     std::fesetround(FE_TONEAREST);
     return {
         .x = static_cast<int>(std::nearbyint(position.x)),
         .y = static_cast<int>(std::nearbyint(position.y)),
     };
+  }
+
+  unsigned points_for_target(SDL_Point const& target)
+  {
+    // normally there is just 1 point per target hit
+    SDL_Rect const inner_field{
+        .x=2,
+        .y=2,
+        .w=PlayingState::CELLS_X-4,
+        .h=PlayingState::CELLS_Y-4,
+    };
+    if (SDL_PointInRect(&target, &inner_field)) {
+      return 1;
+    }
+
+    // targets with a distance of 1 to the wall give double points
+    SDL_Rect const outer_field{
+        .x=1,
+        .y=1,
+        .w=PlayingState::CELLS_X-2,
+        .h=PlayingState::CELLS_Y-2,
+    };
+    if (SDL_PointInRect(&target, &outer_field)) {
+      return 2;
+    }
+
+    // corners give 8 points
+    if ((target.x==0 || target.x==PlayingState::CELLS_X-1) && (target.y==0 || target.y==PlayingState::CELLS_Y-1)) {
+      return 8;
+    }
+
+    // edges give 4 points
+    return 4;
   }
 }
 
@@ -120,8 +156,9 @@ void PlayingState::update(GameStateManager& gsm, std::chrono::milliseconds const
 
     if (target_.contains(new_pos)) {
       target_.erase(new_pos);
-      ++length_;
-      speed_ = std::min(MAX_SPEED, speed_*ACCELERATION);
+      auto const growth = std::min(points_for_target(new_pos), static_cast<unsigned>(CELLS_X*CELLS_Y)-length_);
+      length_ += growth;
+      speed_ = std::min(MAX_SPEED, speed_*std::pow(ACCELERATION, static_cast<float>(growth)));
       if (!place_target()) {
         // technically the player finished the game at this point
         HighScoreManager::instance().set_new_score(length_);
@@ -223,7 +260,7 @@ bool PlayingState::place_target()
   }
 
   auto const wanted_targets = distribution_num_targets(generator_);
-  std::ranges::sample(field, std::inserter(target_, target_.end()),
+  std::ranges::sample(field, std::insert_iterator{target_, target_.end()},
       std::max(static_cast<long long>(wanted_targets-target_.size()), 0ll), generator_);
   deadly_wall_ = distribution_deadly_wall(generator_)!=0;
 
