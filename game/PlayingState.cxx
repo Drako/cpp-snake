@@ -214,6 +214,9 @@ bool PlayingState::place_target()
   for (auto const& particle: tail_) {
     field.erase(particle);
   }
+  for (auto const& target: target_) {
+    field.erase(target);
+  }
 
   if (field.empty()) {
     return false;
