@@ -88,19 +88,33 @@ void PlayingState::update(GameStateManager& gsm, std::chrono::milliseconds const
 
   auto const direction = new_direction_.value_or(direction_);
 
+  auto const MAX_X = static_cast<float>(CELLS_X-1);
+  auto const MAX_Y = static_cast<float>(CELLS_Y-1);
   SDL_FPoint new_head = head_;
   switch (direction) {
   case Direction::Up:
     new_head.y -= distance;
+    if (new_head.y<0.0f && !deadly_wall_) {
+      new_head.y += MAX_Y;
+    }
     break;
   case Direction::Down:
     new_head.y += distance;
+    if (new_head.y>=MAX_Y && !deadly_wall_) {
+      new_head.y -= MAX_Y;
+    }
     break;
   case Direction::Left:
     new_head.x -= distance;
+    if (new_head.x<0.0f && !deadly_wall_) {
+      new_head.x += MAX_X;
+    }
     break;
   case Direction::Right:
     new_head.x += distance;
+    if (new_head.x>=MAX_X && !deadly_wall_) {
+      new_head.x -= MAX_X;
+    }
     break;
   }
 
@@ -112,6 +126,11 @@ void PlayingState::update(GameStateManager& gsm, std::chrono::milliseconds const
       new_direction_.reset();
     }
 
+    if (detect_death(new_pos)) {
+      HighScoreManager::instance().set_new_score(length_);
+      gsm.replace_state(GameStates::GameOver);
+    }
+
     if (new_pos==target_) {
       ++length_;
       speed_ = std::min(MAX_SPEED, speed_*ACCELERATION);
@@ -120,11 +139,6 @@ void PlayingState::update(GameStateManager& gsm, std::chrono::milliseconds const
         HighScoreManager::instance().set_new_score(length_);
         gsm.replace_state(GameStates::GameOver);
       }
-    }
-
-    if (detect_death(new_pos)) {
-      HighScoreManager::instance().set_new_score(length_);
-      gsm.replace_state(GameStates::GameOver);
     }
 
     tail_.push_front(old_pos);
@@ -151,7 +165,8 @@ void PlayingState::handle_direction_change()
     else if (keyboard[SDL_SCANCODE_DOWN] || keyboard[SDL_SCANCODE_S]) {
       new_direction_ = Direction::Down;
     }
-  } else {
+  }
+  else {
     if (keyboard[SDL_SCANCODE_LEFT] || keyboard[SDL_SCANCODE_A]) {
       new_direction_ = Direction::Left;
     }
@@ -190,7 +205,10 @@ void PlayingState::render_ui(SDLRenderer& renderer, SDL_Rect const& playing_fiel
   SDL_RenderCopy(renderer, text, nullptr, &render_quad);
   SDL_DestroyTexture(text);
 
-  SDL_SetRenderDrawColor(renderer, 249, 95, 0, SDL_ALPHA_OPAQUE);
+  if (deadly_wall_)
+    SDL_SetRenderDrawColor(renderer, 249, 95, 0, SDL_ALPHA_OPAQUE);
+  else
+    SDL_SetRenderDrawColor(renderer, 255, 204, 0, SDL_ALPHA_OPAQUE);
   SDL_RenderDrawRect(renderer, &playing_field);
 }
 
@@ -204,6 +222,7 @@ bool PlayingState::place_target()
     }
   }
 
+  field.erase(::head_position(head_));
   for (auto const& particle: tail_) {
     field.erase(particle);
   }
@@ -216,6 +235,7 @@ bool PlayingState::place_target()
   std::ranges::sample(field, std::back_inserter(result), 1, generator_);
 
   target_ = result[0];
+  deadly_wall_ = distribution_deadly_wall(generator_)!=0;
 
   return true;
 }

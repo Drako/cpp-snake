@@ -57,6 +57,7 @@ private:
   std::mt19937 generator_;
   std::uniform_int_distribution<int> distribution_position_x_{0, CELLS_X-1};
   std::uniform_int_distribution<int> distribution_position_y_{0, CELLS_Y-1};
+  std::discrete_distribution<int> distribution_deadly_wall{{5, 95}};
 
   SDL_Point target_{};
   unsigned length_{0u};
@@ -66,6 +67,7 @@ private:
   std::deque<SDL_Point> tail_;
   float speed_{0.001f};
   int fps_{0};
+  bool deadly_wall_{true};
 
   Asset<TTF_Font*> font_;
 };
