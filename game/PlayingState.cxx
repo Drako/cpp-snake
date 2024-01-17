@@ -139,23 +139,24 @@ void PlayingState::handle_direction_change()
 {
   // this is not done in the event handler as we don't want to wait for KEYUP to re-fire in certain situations
   auto const keyboard = SDL_GetKeyboardState(nullptr);
-  if (keyboard[SDL_SCANCODE_UP] || keyboard[SDL_SCANCODE_W]) {
-    if (direction_==Direction::Left || direction_==Direction::Right) {
+
+  if (new_direction_.has_value())
+    return;
+
+  if (direction_==Direction::Left || direction_==Direction::Right) {
+    if (keyboard[SDL_SCANCODE_UP] || keyboard[SDL_SCANCODE_W]) {
       new_direction_ = Direction::Up;
     }
-  }
-  else if (keyboard[SDL_SCANCODE_DOWN] || keyboard[SDL_SCANCODE_S]) {
-    if (direction_==Direction::Left || direction_==Direction::Right) {
+
+    else if (keyboard[SDL_SCANCODE_DOWN] || keyboard[SDL_SCANCODE_S]) {
       new_direction_ = Direction::Down;
     }
-  }
-  else if (keyboard[SDL_SCANCODE_LEFT] || keyboard[SDL_SCANCODE_A]) {
-    if (direction_==Direction::Up || direction_==Direction::Down) {
+  } else {
+    if (keyboard[SDL_SCANCODE_LEFT] || keyboard[SDL_SCANCODE_A]) {
       new_direction_ = Direction::Left;
     }
-  }
-  else if (keyboard[SDL_SCANCODE_RIGHT] || keyboard[SDL_SCANCODE_D]) {
-    if (direction_==Direction::Up || direction_==Direction::Down) {
+
+    else if (keyboard[SDL_SCANCODE_RIGHT] || keyboard[SDL_SCANCODE_D]) {
       new_direction_ = Direction::Right;
     }
   }
