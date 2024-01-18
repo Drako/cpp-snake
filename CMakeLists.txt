@@ -31,8 +31,8 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(SDL2 SDL2_image SDL2_ttf)
 
 configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/Config.hxx.in
-    ${CMAKE_CURRENT_BINARY_DIR}/Config.hxx
+    "${CMAKE_CURRENT_SOURCE_DIR}/Config.hxx.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/Config.hxx"
     @ONLY
 )
 
@@ -67,9 +67,11 @@ if (WIN32)
   target_sources(Snake PRIVATE windows-resources.rc)
 endif (WIN32)
 
-set_target_properties(Snake PROPERTIES
-    RUNTIME_OUTPUT_NAME snake
-)
+if ((NOT WIN32) AND (NOT APPLE))
+  set_target_properties(Snake PROPERTIES
+      RUNTIME_OUTPUT_NAME snake
+  )
+endif ()
 target_link_libraries(Snake PRIVATE
     SDL2::SDL2 SDL2::SDL2main
     SDL2_image::SDL2_image
@@ -98,6 +100,30 @@ elseif (APPLE)
   set_source_files_properties(${assets} PROPERTIES
       MACOSX_PACKAGE_LOCATION Resources/assets
   )
+  target_sources(Snake PRIVATE snake-icon.icns)
+  set_source_files_properties(snake-icon.icns PROPERTIES
+      MACOSX_PACKAGE_LOCATION Resources
+  )
+
+  get_dependency_location(SDL2_directory DEPENDENCY SDL2::SDL2)
+  string(REPLACE "Cellar/sdl2/2.28.5/lib" "lib" dependency_dir "${SDL2_directory}")
+
+  configure_file(
+      "${CMAKE_CURRENT_SOURCE_DIR}/FixupBundle.cmake.in"
+      "${CMAKE_CURRENT_BINARY_DIR}/FixupBundle.cmake"
+      @ONLY
+  )
+  install(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/FixupBundle.cmake")
+
+  set(MACOSX_BUNDLE_BUNDLE_NAME "Snake")
+  set(MACOSX_BUNDLE_COPYRIGHT "Copyright © 2024, Felix Bytow &lt;drako@drako.guru&gt;")
+  set(MACOSX_BUNDLE_ICON_FILE snake-icon.icns)
+
+  #set(CPACK_GENERATOR DragNDrop)
+  #set(CPACK_PACKAGE_NAME "Snake")
+  #set(CPACK_PACKAGE_VENDOR "Draconic Bytes")
+  #set(CPACK_BUNDLE_APPLE_CERT_APP "Felix Bytow")
+  #include(CPack)
 else ()
   install(TARGETS Snake DESTINATION bin)
   install(FILES ${assets} DESTINATION share/snake/assets)

@@ -19,10 +19,12 @@ AssetManager::AssetManager(SDLRenderer& renderer)
   assert(instance_==nullptr);
 
   auto const current_path = fs::current_path();
+  auto const base_path = fs::path{SDL_GetBasePath()};
   std::array const asset_paths{
       current_path/"assets",
       current_path.parent_path()/"assets",
       current_path.parent_path()/"Resources"/"assets", // MacOS bundle
+      base_path/"assets", // MacOS bundle
       INSTALLED_ASSETS_PATH,
   };
 
@@ -30,6 +32,7 @@ AssetManager::AssetManager(SDLRenderer& renderer)
     return fs::exists(p);
   });
   if (it==std::end(asset_paths)) {
+    SDL_Log("Assets directory not found, current path: %s.", current_path.string().c_str());
     throw std::runtime_error("Assets directory not found.");
   }
 
