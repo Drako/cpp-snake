@@ -105,6 +105,11 @@ elseif (APPLE)
       MACOSX_PACKAGE_LOCATION Resources
   )
 
+  set_target_properties(Snake PROPERTIES
+      XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "Apple Developer"
+      XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "YES"
+  )
+
   get_dependency_location(SDL2_directory DEPENDENCY SDL2::SDL2)
   string(REPLACE "Cellar/sdl2/2.28.5/lib" "lib" dependency_dir "${SDL2_directory}")
 
@@ -118,12 +123,6 @@ elseif (APPLE)
   set(MACOSX_BUNDLE_BUNDLE_NAME "Snake")
   set(MACOSX_BUNDLE_COPYRIGHT "Copyright © 2024, Felix Bytow &lt;drako@drako.guru&gt;")
   set(MACOSX_BUNDLE_ICON_FILE snake-icon.icns)
-
-  #set(CPACK_GENERATOR DragNDrop)
-  #set(CPACK_PACKAGE_NAME "Snake")
-  #set(CPACK_PACKAGE_VENDOR "Draconic Bytes")
-  #set(CPACK_BUNDLE_APPLE_CERT_APP "Felix Bytow")
-  #include(CPack)
 else ()
   install(TARGETS Snake DESTINATION bin)
   install(FILES ${assets} DESTINATION share/snake/assets)

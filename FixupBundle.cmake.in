@@ -4,4 +4,4 @@ set(dirs
   "@dependency_dir@"
 )
 
-fixup_bundle("@CMAKE_CURRENT_BINARY_DIR@/Snake.app" "" "" "${dirs}")
+fixup_bundle("@CMAKE_CURRENT_BINARY_DIR@/Snake.app" "" "${dirs}")
