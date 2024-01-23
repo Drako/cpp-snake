@@ -100,4 +100,9 @@ void SDL::remove_controller(int which)
   }
 }
 
+std::vector<SDL_GameController*> const& SDL::get_controllers() const
+{
+  return controllers_;
+}
+
 

@@ -50,6 +50,8 @@ public:
 
   void remove_controller(int which);
 
+  std::vector<SDL_GameController *> const& get_controllers() const;
+
 private:
   static SDL* instance_;
 

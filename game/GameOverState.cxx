@@ -58,6 +58,21 @@ void GameOverState::on_event(GameStateManager& gsm, SDL_Event const& evt)
       gsm.replace_state(GameStates::MainMenu);
       break;
     }
+  } else if (evt.type==SDL_CONTROLLERBUTTONUP) {
+    switch (evt.cbutton.which) {
+    default:
+      break;
+    // TODO: for full controller support, the input must provide an onscreen keyboard
+    // in that case the controller buttons etc. used to interact with this state will need adjustment
+    case SDL_CONTROLLER_BUTTON_A:
+      HighScoreManager::instance().provide_name_for_new_score(name_input_.value());
+      [[fallthrough]];
+    case SDL_CONTROLLER_BUTTON_B:
+      [[fallthrough]];
+    case SDL_CONTROLLER_BUTTON_START:
+      gsm.replace_state(GameStates::MainMenu);
+      break;
+    }
   }
 }
 

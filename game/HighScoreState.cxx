@@ -18,7 +18,22 @@ void HighScoreState::on_event(GameStateManager& gsm, SDL_Event const& event)
       break;
     case SDL_SCANCODE_ESCAPE:
       [[fallthrough]];
+    case SDL_SCANCODE_SPACE:
+      [[fallthrough]];
     case SDL_SCANCODE_RETURN:
+      gsm.pop_state();
+      break;
+    }
+  }
+  else if (event.type==SDL_CONTROLLERBUTTONUP) {
+    switch (event.cbutton.which) {
+    default:
+      break;
+    case SDL_CONTROLLER_BUTTON_A:
+      [[fallthrough]];
+    case SDL_CONTROLLER_BUTTON_B:
+      [[fallthrough]];
+    case SDL_CONTROLLER_BUTTON_START:
       gsm.pop_state();
       break;
     }

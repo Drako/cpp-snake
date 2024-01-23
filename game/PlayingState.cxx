@@ -96,6 +96,11 @@ void PlayingState::on_event(GameStateManager& gsm, SDL_Event const& evt)
     if (scancode==SDL_SCANCODE_ESCAPE || scancode==SDL_SCANCODE_PAUSE)
       gsm.push_state(GameStates::MainMenu);
   }
+  else if (evt.type==SDL_CONTROLLERBUTTONUP) {
+    auto const button = evt.cbutton.button;
+    if (button==SDL_CONTROLLER_BUTTON_START)
+      gsm.push_state(GameStates::MainMenu);
+  }
 }
 
 void PlayingState::update(GameStateManager& gsm, std::chrono::milliseconds const delta_time)
@@ -176,27 +181,43 @@ void PlayingState::update(GameStateManager& gsm, std::chrono::milliseconds const
 
 void PlayingState::handle_direction_change()
 {
-  // this is not done in the event handler as we don't want to wait for KEYUP to re-fire in certain situations
-  auto const keyboard = SDL_GetKeyboardState(nullptr);
-
   if (new_direction_.has_value())
     return;
 
+  // this is not done in the event handler as we don't want to wait for KEYDOWN to re-fire in certain situations
+  auto const keyboard = SDL_GetKeyboardState(nullptr);
+  auto const& controllers = SDL::instance().get_controllers();
+  bool controller_up = false, controller_down = false, controller_left = false, controller_right = false;
+  for (auto const controller: controllers) {
+    controller_up = controller_up
+        || (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_UP)==1)
+        || (SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY)<-13'000);
+    controller_down = controller_down
+        || (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_DOWN)==1)
+        || (SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY)>13'000);
+    controller_left = controller_left
+        || (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_LEFT)==1)
+        || (SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX)<-13'000);
+    controller_right = controller_right
+        || (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT)==1)
+        || (SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX)>13'000);
+  }
+
   if (direction_==Direction::Left || direction_==Direction::Right) {
-    if (keyboard[SDL_SCANCODE_UP] || keyboard[SDL_SCANCODE_W]) {
+    if (keyboard[SDL_SCANCODE_UP] || keyboard[SDL_SCANCODE_W] || controller_up) {
       new_direction_ = Direction::Up;
     }
 
-    else if (keyboard[SDL_SCANCODE_DOWN] || keyboard[SDL_SCANCODE_S]) {
+    else if (keyboard[SDL_SCANCODE_DOWN] || keyboard[SDL_SCANCODE_S] || controller_down) {
       new_direction_ = Direction::Down;
     }
   }
   else {
-    if (keyboard[SDL_SCANCODE_LEFT] || keyboard[SDL_SCANCODE_A]) {
+    if (keyboard[SDL_SCANCODE_LEFT] || keyboard[SDL_SCANCODE_A] || controller_left) {
       new_direction_ = Direction::Left;
     }
 
-    else if (keyboard[SDL_SCANCODE_RIGHT] || keyboard[SDL_SCANCODE_D]) {
+    else if (keyboard[SDL_SCANCODE_RIGHT] || keyboard[SDL_SCANCODE_D] || controller_right) {
       new_direction_ = Direction::Right;
     }
   }
