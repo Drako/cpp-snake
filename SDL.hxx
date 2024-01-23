@@ -9,6 +9,7 @@
 #include <source_location>
 #include <stdexcept>
 #include <string_view>
+#include <vector>
 
 #include "NonCopyable.hxx"
 
@@ -45,8 +46,14 @@ public:
 
   static SDL& require(std::uint32_t flags) noexcept;
 
+  void add_controller(int which);
+
+  void remove_controller(int which);
+
 private:
   static SDL* instance_;
+
+  std::vector<SDL_GameController*> controllers_;
 };
 
 #endif // SNAKE_SDL_HXX

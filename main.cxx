@@ -18,6 +18,19 @@ void main_loop(SDLWindow& window, SDLRenderer& renderer)
   for (;;) {
     SDL_Event evt;
     while (SDL_PollEvent(&evt)!=0) {
+      switch (evt.type) {
+      default:
+        break;
+      case SDL_QUIT:
+        return;
+      case SDL_CONTROLLERDEVICEADDED:
+        SDL::instance().add_controller(evt.cdevice.which);
+        break;
+      case SDL_CONTROLLERDEVICEREMOVED:
+        SDL::instance().remove_controller(evt.cdevice.which);
+        break;
+      }
+
       if (evt.type==SDL_QUIT)
         return;
 

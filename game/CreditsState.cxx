@@ -62,6 +62,19 @@ void CreditsState::on_event(GameStateManager& gsm, SDL_Event const& event)
       break;
     }
   }
+  else if (event.type==SDL_CONTROLLERBUTTONUP) {
+    switch (event.cbutton.which) {
+    default:
+      break;
+    case SDL_CONTROLLER_BUTTON_A:
+      [[fallthrough]];
+    case SDL_CONTROLLER_BUTTON_B:
+      [[fallthrough]];
+    case SDL_CONTROLLER_BUTTON_START:
+      gsm.pop_state();
+      break;
+    }
+  }
 }
 
 void CreditsState::update(GameStateManager& gsm, std::chrono::milliseconds const delta_time)

@@ -43,12 +43,22 @@ SDL::SDL(std::uint32_t const flags)
   }
   SDL_Log("Initialized SDL_ttf successfully.");
 
+  auto const num_joysticks = SDL_NumJoysticks();
+  for (int n = 0; n<num_joysticks; ++n) {
+    add_controller(n);
+  }
+
   instance_ = this;
 }
 
 SDL::~SDL() noexcept
 {
   assert(instance_!=nullptr);
+
+  for (auto const controller: controllers_) {
+    SDL_Log("Closing controller %s.", SDL_GameControllerName(controller));
+    SDL_GameControllerClose(controller);
+  }
 
   TTF_Quit();
   SDL_Log("Shut down SDL_ttf successfully.");
@@ -71,6 +81,23 @@ SDL& SDL::require(std::uint32_t const flags) noexcept
 {
   assert((SDL_WasInit(flags) | SDL_INIT_NOPARACHUTE)==(flags | SDL_INIT_NOPARACHUTE));
   return instance();
+}
+
+void SDL::add_controller(int const which)
+{
+  controllers_.push_back(SDL_GameControllerOpen(which));
+  SDL_Log("Opened controller %s.", SDL_GameControllerNameForIndex(which));
+}
+
+void SDL::remove_controller(int which)
+{
+  auto const controller = SDL_GameControllerFromInstanceID(which);
+  SDL_Log("Closing controller %s.", SDL_GameControllerName(controller));
+  SDL_GameControllerClose(controller);
+  auto const it = std::find(controllers_.begin(), controllers_.end(), controller);
+  if (it!=controllers_.end()) {
+    controllers_.erase(it);
+  }
 }
 
 

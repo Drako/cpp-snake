@@ -6,7 +6,10 @@ using namespace std::chrono_literals;
 
 void SplashState::on_event(GameStateManager& gsm, SDL_Event const& evt)
 {
-  if (evt.type==SDL_KEYUP) {
+  switch (evt.type) {
+  default:
+    break;
+  case SDL_KEYUP:
     switch (evt.key.keysym.scancode) {
     default:
       break;
@@ -18,6 +21,20 @@ void SplashState::on_event(GameStateManager& gsm, SDL_Event const& evt)
       gsm.replace_state(GameStates::MainMenu);
       break;
     }
+    break;
+  case SDL_CONTROLLERBUTTONUP:
+    switch (evt.cbutton.button) {
+    default:
+      break;
+    case SDL_CONTROLLER_BUTTON_A:
+      [[fallthrough]];
+    case SDL_CONTROLLER_BUTTON_B:
+      [[fallthrough]];
+    case SDL_CONTROLLER_BUTTON_START:
+      gsm.replace_state(GameStates::MainMenu);
+      break;
+    }
+    break;
   }
 }
 

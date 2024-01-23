@@ -9,6 +9,7 @@
 void MenuState::on_enter(GameStateManager& gsm)
 {
   active_button_ = 0;
+  last_controller_direction_ = 0;
 
   auto const& tm = TranslationManager::instance();
   new_game_button_.set_title(tm.get_translation("New game"));
@@ -58,74 +59,27 @@ void MenuState::on_enter(GameStateManager& gsm)
 
 void MenuState::on_event(GameStateManager& gsm, SDL_Event const& evt)
 {
-  if (evt.type==SDL_KEYUP) {
-    switch (evt.key.keysym.scancode) {
-    default:
-      break;
-    case SDL_SCANCODE_PAUSE:
-      if (gsm.parent()==nullptr)
-        break;
-      [[fallthrough]];
-    case SDL_SCANCODE_ESCAPE:
-      gsm.pop_state();
-      break;
-    case SDL_SCANCODE_UP:
-      SDL_ShowCursor(SDL_DISABLE);
-      --active_button_;
-      if (active_button_<0)
-        active_button_ = 4;
-      else if (active_button_==1 && !continue_button_.is_visible())
-        active_button_ = 0;
-      break;
-    case SDL_SCANCODE_DOWN:
-      SDL_ShowCursor(SDL_DISABLE);
-      ++active_button_;
-      if (active_button_>4)
-        active_button_ = 0;
-      else if (active_button_==1 && !continue_button_.is_visible())
-        active_button_ = 2;
-      break;
-    case SDL_SCANCODE_RETURN:
-      switch (active_button_) {
-      case 0:
-        new_game_button_.trigger();
-        break;
-      case 1:
-        continue_button_.trigger();
-        break;
-      case 2:
-        high_score_button_.trigger();
-        break;
-      case 3:
-        credits_button_.trigger();
-        break;
-      case 4:
-        quit_button_.trigger();
-        break;
-      }
-      break;
-    }
-  }
-  else if (evt.type==SDL_MOUSEMOTION) {
-    SDL_ShowCursor(SDL_ENABLE);
-
-    auto const x = evt.motion.x;
-    auto const y = evt.motion.y;
-
-    std::array<Button*, 5> buttons{&new_game_button_, nullptr, &high_score_button_, &credits_button_, &quit_button_};
-    if (continue_button_.is_visible())
-      buttons[1] = &continue_button_;
-
-    for (std::size_t n = 0; n<buttons.size(); ++n) {
-      if (buttons[n]==nullptr)
-        continue;
-
-      auto const box = buttons[n]->get_bounding_box();
-      if (x>=box.x && x<=box.x+box.w && y>=box.y && y<=box.y+box.h) {
-        active_button_ = static_cast<int>(n);
-        break;
-      }
-    }
+  switch (evt.type) {
+  default:
+    break;
+  case SDL_KEYUP:
+    handle_key_up(gsm, evt.key.keysym.scancode);
+    break;
+  case SDL_KEYDOWN:
+    handle_key_down(evt.key.keysym.scancode);
+    break;
+  case SDL_CONTROLLERBUTTONUP:
+    handle_controller_button_up(gsm, evt.cbutton.button);
+    break;
+  case SDL_CONTROLLERBUTTONDOWN:
+    handle_controller_button_down(evt.cbutton.button);
+    break;
+  case SDL_CONTROLLERAXISMOTION:
+    handle_controller_axis_motion(evt.caxis.axis, evt.caxis.value);
+    break;
+  case SDL_MOUSEMOTION:
+    handle_mouse_movement(evt.motion.x, evt.motion.y);
+    break;
   }
 }
 
@@ -195,4 +149,155 @@ void MenuState::render(SDLRenderer& renderer)
 void MenuState::on_leave()
 {
   SDL_ShowCursor(SDL_DISABLE);
+}
+
+void MenuState::select_previous_button()
+{
+  SDL_ShowCursor(SDL_DISABLE);
+  --active_button_;
+  if (active_button_<0)
+    active_button_ = 4;
+  else if (active_button_==1 && !continue_button_.is_visible())
+    active_button_ = 0;
+}
+
+void MenuState::select_next_button()
+{
+  SDL_ShowCursor(SDL_DISABLE);
+  ++active_button_;
+  if (active_button_>4)
+    active_button_ = 0;
+  else if (active_button_==1 && !continue_button_.is_visible())
+    active_button_ = 2;
+}
+
+void MenuState::handle_key_up(GameStateManager& gsm, SDL_Scancode const scancode)
+{
+  switch (scancode) {
+  default:
+    break;
+  case SDL_SCANCODE_PAUSE:
+    if (gsm.parent()==nullptr)
+      break;
+    [[fallthrough]];
+  case SDL_SCANCODE_ESCAPE:
+    gsm.pop_state();
+    break;
+  case SDL_SCANCODE_SPACE:
+    [[fallthrough]];
+  case SDL_SCANCODE_RETURN:
+    trigger_active_button();
+    break;
+  }
+}
+
+void MenuState::handle_key_down(SDL_Scancode const scancode)
+{
+  switch (scancode) {
+  default:
+    break;
+  case SDL_SCANCODE_UP:
+    select_previous_button();
+    break;
+  case SDL_SCANCODE_DOWN:
+    select_next_button();
+    break;
+  }
+}
+
+void MenuState::trigger_active_button()
+{
+  switch (active_button_) {
+  case 0:
+    new_game_button_.trigger();
+    break;
+  case 1:
+    continue_button_.trigger();
+    break;
+  case 2:
+    high_score_button_.trigger();
+    break;
+  case 3:
+    credits_button_.trigger();
+    break;
+  case 4:
+    quit_button_.trigger();
+    break;
+  }
+}
+
+void MenuState::handle_mouse_movement(int const x, int const y)
+{
+  SDL_ShowCursor(SDL_ENABLE);
+
+  std::array<Button*, 5> buttons{&new_game_button_, nullptr, &high_score_button_, &credits_button_, &quit_button_};
+  if (continue_button_.is_visible())
+    buttons[1] = &continue_button_;
+
+  for (std::size_t n = 0; n<buttons.size(); ++n) {
+    if (buttons[n]==nullptr)
+      continue;
+
+    auto const box = buttons[n]->get_bounding_box();
+    if (x>=box.x && x<=box.x+box.w && y>=box.y && y<=box.y+box.h) {
+      active_button_ = static_cast<int>(n);
+      break;
+    }
+  }
+}
+
+void MenuState::handle_controller_button_up(GameStateManager& gsm, std::uint8_t const button)
+{
+  switch (button) {
+  default:
+    break;
+  case SDL_CONTROLLER_BUTTON_START:
+    [[fallthrough]];
+  case SDL_CONTROLLER_BUTTON_B:
+    if (gsm.parent()==nullptr)
+      break;
+    gsm.pop_state();
+    break;
+  case SDL_CONTROLLER_BUTTON_A:
+    trigger_active_button();
+    break;
+  }
+}
+
+void MenuState::handle_controller_button_down(std::uint8_t const button)
+{
+  switch (button) {
+  default:
+    break;
+  case SDL_CONTROLLER_BUTTON_DPAD_UP:
+    select_previous_button();
+    break;
+  case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+    select_next_button();
+    break;
+  }
+}
+
+void MenuState::handle_controller_axis_motion(std::uint8_t const axis, std::int16_t const value)
+{
+  if (axis!=SDL_CONTROLLER_AXIS_LEFTY)
+    return;
+
+  if (value<-10'000) {
+    if (last_controller_direction_==-1)
+      return;
+
+    last_controller_direction_ = -1;
+    select_previous_button();
+  }
+  else if (value>10'000) {
+    if (last_controller_direction_==1)
+      return;
+
+    last_controller_direction_ = 1;
+    select_next_button();
+  }
+  else {
+    last_controller_direction_ = 0;
+  }
 }
