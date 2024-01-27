@@ -12,9 +12,6 @@ void LoadingState::update(GameStateManager& gsm, std::chrono::milliseconds const
 
 void LoadingState::render(SDLRenderer& renderer)
 {
-  SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-  SDL_RenderClear(renderer);
-
   static int const BAR_MARGIN = 30;
   static int const BAR_HEIGHT = 50;
 
@@ -48,8 +45,6 @@ void LoadingState::render(SDLRenderer& renderer)
   };
   SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
   SDL_RenderFillRect(renderer, &progress_rect);
-
-  SDL_RenderPresent(renderer);
 }
 
 void LoadingState::on_enter(GameStateManager& gsm)

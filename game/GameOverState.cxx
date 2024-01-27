@@ -89,9 +89,6 @@ void GameOverState::render(SDLRenderer& renderer)
   int width, height;
   SDL_GetRendererOutputSize(renderer, &width, &height);
 
-  SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-  SDL_RenderClear(renderer);
-
   int base_y;
   auto const& hsm = HighScoreManager::instance();
   if (hsm.has_new_score()) {
@@ -140,6 +137,4 @@ void GameOverState::render(SDLRenderer& renderer)
 
   ok_button_.move((width-ok_button_.get_bounding_box().w)/2, base_y);
   ok_button_.render(renderer);
-
-  SDL_RenderPresent(renderer);
 }

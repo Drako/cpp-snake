@@ -224,11 +224,6 @@ void PlayingState::handle_direction_change()
   }
 }
 
-void PlayingState::render(SDLRenderer& renderer)
-{
-  render_game(renderer);
-}
-
 void PlayingState::render_ui(SDLRenderer& renderer, SDL_Rect const& playing_field)
 {
   auto const& tm = TranslationManager::instance();
@@ -359,7 +354,7 @@ bool PlayingState::detect_death(SDL_Point const& position)
   }));
 }
 
-void PlayingState::render_game(SDLRenderer& renderer, bool is_current_state)
+void PlayingState::render(SDLRenderer& renderer)
 {
   int width, height;
   SDL_GetRendererOutputSize(renderer, &width, &height);
@@ -379,15 +374,7 @@ void PlayingState::render_game(SDLRenderer& renderer, bool is_current_state)
   playing_field.x = (width-playing_field.w)/2;
   playing_field.y = 50;
 
-  if (is_current_state) {
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-    SDL_RenderClear(renderer);
-  }
-
   render_snake(renderer, playing_field);
   render_target(renderer, playing_field);
   render_ui(renderer, playing_field);
-
-  if (is_current_state)
-    SDL_RenderPresent(renderer);
 }

@@ -49,8 +49,14 @@ void main_loop(SDLWindow& window, SDLRenderer& renderer)
     else
       return;
 
-    if (auto const state = gsm.current(); state!=nullptr)
+    if (auto const state = gsm.current(); state!=nullptr) {
+      SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+      SDL_RenderClear(renderer);
+
       state->render(renderer);
+
+      SDL_RenderPresent(renderer);
+    }
     else
       return;
   }

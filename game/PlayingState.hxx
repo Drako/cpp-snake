@@ -49,8 +49,6 @@ public:
 
   void render(SDLRenderer& renderer) override;
 
-  void render_game(SDLRenderer& renderer, bool is_current_state = true);
-
 private:
 
   void place_head();

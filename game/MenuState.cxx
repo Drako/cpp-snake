@@ -127,11 +127,8 @@ void MenuState::render(SDLRenderer& renderer)
   adjust_button_position(credits_button_, x, y += BUTTON_HEIGHT+20);
   adjust_button_position(quit_button_, x, y+BUTTON_HEIGHT+20);
 
-  SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-  SDL_RenderClear(renderer);
-
   if (game_.has_value()) {
-    game_.value()->render_game(renderer, false);
+    game_.value()->render(renderer);
   }
 
   SDL_SetRenderDrawColor(renderer, 0, 0, 0, 200);
@@ -142,8 +139,6 @@ void MenuState::render(SDLRenderer& renderer)
   high_score_button_.render(renderer);
   credits_button_.render(renderer);
   quit_button_.render(renderer);
-
-  SDL_RenderPresent(renderer);
 }
 
 void MenuState::on_leave()

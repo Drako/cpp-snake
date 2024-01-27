@@ -48,9 +48,6 @@ void HighScoreState::render(SDLRenderer& renderer)
   SDL_RenderGetViewport(renderer, &viewport);
   int width = viewport.w;
 
-  SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-  SDL_RenderClear(renderer);
-
   SDL_Color const color = {255, 255, 255, SDL_ALPHA_OPAQUE};
 
   render_heading(renderer, width, color);
@@ -75,8 +72,6 @@ void HighScoreState::render(SDLRenderer& renderer)
     SDL_FreeSurface(surface);
     SDL_DestroyTexture(texture);
   }
-
-  SDL_RenderPresent(renderer);
 }
 
 void HighScoreState::render_heading(SDLRenderer& renderer, int const width, SDL_Color const& color)

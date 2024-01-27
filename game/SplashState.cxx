@@ -47,9 +47,6 @@ void SplashState::update(GameStateManager& gsm, std::chrono::milliseconds delta_
 
 void SplashState::render(SDLRenderer& renderer)
 {
-  SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-  SDL_RenderClear(renderer);
-
   if (time_in_state_>=2'000ms && time_in_state_<11'000ms) {
     if (time_in_state_<4'000ms) {
       auto const progress = static_cast<float>(time_in_state_.count()-2'000)/2'000.0f;
@@ -91,8 +88,6 @@ void SplashState::render(SDLRenderer& renderer)
     };
     SDL_RenderCopy(renderer, logo_, nullptr, &logo_rect);
   }
-
-  SDL_RenderPresent(renderer);
 }
 
 void SplashState::on_enter(GameStateManager& gsm)

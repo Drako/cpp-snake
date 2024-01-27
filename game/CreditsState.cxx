@@ -90,9 +90,6 @@ void CreditsState::render(SDLRenderer& renderer)
 {
   TTF_Font* const font = font_;
 
-  SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-  SDL_RenderClear(renderer);
-
   int window_width = 0, window_height = 0;
   SDL_GetRendererOutputSize(renderer, &window_width, &window_height);
 
@@ -146,6 +143,4 @@ void CreditsState::render(SDLRenderer& renderer)
       y += h+ITEM_PADDING;
     }, item);
   }
-
-  SDL_RenderPresent(renderer);
 }
