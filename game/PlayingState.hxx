@@ -68,8 +68,8 @@ private:
   void handle_direction_change();
 
   std::mt19937 generator_;
-  std::uniform_int_distribution<int> distribution_position_x_{0, CELLS_X-1};
-  std::uniform_int_distribution<int> distribution_position_y_{0, CELLS_Y-1};
+  std::uniform_int_distribution<int> distribution_position_x_{10, CELLS_X-11};
+  std::uniform_int_distribution<int> distribution_position_y_{10, CELLS_Y-11};
   std::discrete_distribution<int> distribution_deadly_wall{{10, 90}};
   std::discrete_distribution<std::size_t> distribution_num_targets{{0, 75, 20, 5}};
 

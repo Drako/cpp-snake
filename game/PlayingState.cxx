@@ -9,6 +9,7 @@
 #include <cmath>
 #include <iterator>
 #include <random>
+#include <ranges>
 
 namespace {
   SDL_Point head_position(SDL_FPoint const& position)
@@ -290,61 +291,60 @@ bool PlayingState::place_target()
 
 void PlayingState::place_head()
 {
-  do {
-    head_.x = static_cast<float>(distribution_position_x_(generator_));
-  }
-  while (head_.x<10.0f || head_.x>static_cast<float>(CELLS_X-10));
-
-  do {
-    head_.y = static_cast<float>(distribution_position_y_(generator_));
-  }
-  while (head_.y<10.0f || head_.y>static_cast<float>(CELLS_Y-10));
+  head_.x = static_cast<float>(distribution_position_x_(generator_));
+  head_.y = static_cast<float>(distribution_position_y_(generator_));
 }
 
 void PlayingState::render_target(SDLRenderer& renderer, SDL_Rect const& playing_field)
 {
   auto const ratio = playing_field.w/static_cast<double>(CELLS_X);
 
-  SDL_SetRenderDrawColor(renderer, 76, 208, 45, SDL_ALPHA_OPAQUE);
-  for (auto const& target: target_) {
-    SDL_Rect const target_rect{
-        .x = static_cast<int>(playing_field.x+ratio*target.x),
-        .y = static_cast<int>(playing_field.y+ratio*target.y),
-        .w = static_cast<int>(ratio),
-        .h = static_cast<int>(ratio),
-    };
+  std::vector<SDL_Rect> target_rects;
+  target_rects.reserve(target_.size());
+  std::ranges::transform(target_, std::back_insert_iterator{target_rects},
+      [ratio, playing_field](SDL_Point const& target) {
+        return SDL_Rect{
+            .x = static_cast<int>(playing_field.x+ratio*target.x),
+            .y = static_cast<int>(playing_field.y+ratio*target.y),
+            .w = static_cast<int>(ratio),
+            .h = static_cast<int>(ratio),
+        };
+      });
 
-    SDL_RenderFillRect(renderer, &target_rect);
-  }
+  SDL_SetRenderDrawColor(renderer, 76, 208, 45, SDL_ALPHA_OPAQUE);
+  SDL_RenderFillRects(renderer, target_rects.data(), static_cast<int>(target_rects.size()));
 }
 
 void PlayingState::render_snake(SDLRenderer& renderer, SDL_Rect const& playing_field)
 {
   auto const ratio = playing_field.w/static_cast<double>(CELLS_X);
-  auto const render_dot = [ratio, playing_field, &renderer](SDL_Point const& position, double const size_factor) {
+  double const decay = 1.0/static_cast<double>(tail_.size()+1);
+
+  auto calculate_rect = [ratio, playing_field, decay, size_factor = 1.0](SDL_Point const& position) mutable {
     int const base_x = static_cast<int>(playing_field.x+ratio*position.x);
     int const base_y = static_cast<int>(playing_field.y+ratio*position.y);
     int const size = std::max(1, static_cast<int>(ratio*size_factor));
     int const padding = (static_cast<int>(ratio)-size) >> 1;
-    SDL_Rect const target_rect{
+
+    size_factor = std::max(0.0, size_factor-decay);
+
+    return SDL_Rect{
         .x = base_x+padding,
         .y = base_y+padding,
         .w = size,
         .h = size,
     };
-
-    SDL_RenderFillRect(renderer, &target_rect);
   };
 
-  SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
-  double size = 1.0;
-  double const decay = 1.0/static_cast<double>(tail_.size()+1);
-  for (auto const& particle: tail_) {
-    size = std::max(0.0, size-decay);
-    render_dot(particle, size);
-  }
   SDL_SetRenderDrawColor(renderer, 0, 170, 231, SDL_ALPHA_OPAQUE);
-  render_dot(::head_position(head_), 1.0);
+  auto const head_rect = calculate_rect(::head_position(head_));
+  SDL_RenderFillRect(renderer, &head_rect);
+
+  std::vector<SDL_Rect> rects;
+  rects.reserve(tail_.size());
+  std::ranges::transform(tail_, std::back_insert_iterator{rects}, calculate_rect);
+  SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+  SDL_RenderFillRects(renderer, rects.data(), static_cast<int>(rects.size()));
 }
 
 bool PlayingState::detect_death(SDL_Point const& position)
