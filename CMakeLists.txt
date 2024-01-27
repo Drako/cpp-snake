@@ -124,6 +124,13 @@ elseif (APPLE)
   set(MACOSX_BUNDLE_COPYRIGHT "Copyright © 2024, Felix Bytow &lt;drako@drako.guru&gt;")
   set(MACOSX_BUNDLE_ICON_FILE snake-icon.icns)
 else ()
+  configure_file(
+      "${CMAKE_CURRENT_SOURCE_DIR}/Snake.desktop.in"
+      "${CMAKE_CURRENT_BINARY_DIR}/Snake.desktop"
+      @ONLY
+  )
+
   install(TARGETS Snake DESTINATION bin)
   install(FILES ${assets} DESTINATION share/snake/assets)
+  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/Snake.desktop" DESTINATION share/applications)
 endif ()
