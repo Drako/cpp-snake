@@ -1,5 +1,6 @@
 #include "SDL.hxx"
 
+#include <algorithm>
 #include <cassert>
 #include <sstream>
 
