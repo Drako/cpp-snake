@@ -79,6 +79,7 @@ private:
   std::deque<SDL_Point> tail_;
   float speed_{0.001f};
   int fps_{0};
+  bool show_fps_{false};
   bool deadly_wall_{true};
 
   Asset<TTF_Font*> font_;

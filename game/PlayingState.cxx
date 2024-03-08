@@ -95,6 +95,8 @@ void PlayingState::on_event(GameStateManager& gsm, SDL_Event const& evt)
     auto const scancode = evt.key.keysym.scancode;
     if (scancode==SDL_SCANCODE_ESCAPE || scancode==SDL_SCANCODE_PAUSE)
       gsm.push_state(GameStates::MainMenu);
+    else if (scancode==SDL_SCANCODE_F)
+      show_fps_ = !show_fps_;
   }
   else if (evt.type==SDL_CONTROLLERBUTTONUP) {
     auto const button = evt.cbutton.button;
@@ -237,14 +239,16 @@ void PlayingState::render_ui(SDLRenderer& renderer, SDL_Rect const& playing_fiel
   SDL_RenderCopy(renderer, text, nullptr, &render_quad);
   SDL_DestroyTexture(text);
 
-  auto const fps_text = tm.get_translation("Frames per second")+": "+std::to_string(fps_);
-  text_surface = TTF_RenderUTF8_Solid(font_, fps_text.c_str(), {255, 255, 255, SDL_ALPHA_OPAQUE});
-  text = SDL_CreateTextureFromSurface(renderer, text_surface);
-  SDL_FreeSurface(text_surface);
-  SDL_QueryTexture(text, nullptr, nullptr, &text_width, &text_height);
-  render_quad = {playing_field.x+playing_field.w-text_width, 10, text_width, text_height};
-  SDL_RenderCopy(renderer, text, nullptr, &render_quad);
-  SDL_DestroyTexture(text);
+  if (show_fps_) {
+    auto const fps_text = tm.get_translation("Frames per second")+": "+std::to_string(fps_);
+    text_surface = TTF_RenderUTF8_Solid(font_, fps_text.c_str(), {255, 255, 255, SDL_ALPHA_OPAQUE});
+    text = SDL_CreateTextureFromSurface(renderer, text_surface);
+    SDL_FreeSurface(text_surface);
+    SDL_QueryTexture(text, nullptr, nullptr, &text_width, &text_height);
+    render_quad = {playing_field.x+playing_field.w-text_width, 10, text_width, text_height};
+    SDL_RenderCopy(renderer, text, nullptr, &render_quad);
+    SDL_DestroyTexture(text);
+  }
 
   if (deadly_wall_)
     SDL_SetRenderDrawColor(renderer, 249, 95, 0, SDL_ALPHA_OPAQUE);
