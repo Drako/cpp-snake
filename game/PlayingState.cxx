@@ -9,7 +9,6 @@
 #include <cmath>
 #include <iterator>
 #include <random>
-#include <ranges>
 
 namespace {
   SDL_Point head_position(SDL_FPoint const& position)

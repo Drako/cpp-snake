@@ -1,6 +1,7 @@
 #include "GameStateManager.hxx"
 
 #include <cassert>
+#include <utility>
 
 GameStateManager::GameStateManager(SDLWindow& window)
     :window_{window}, states_{{GameStates::Loading}}
@@ -19,9 +20,7 @@ GameState* GameStateManager::enum_to_state(GameStates const state)
 {
   switch (state) {
   default:
-    // this should no longer be reachable as all states are handled
-    assert(false);
-    return nullptr;
+    std::unreachable();
   case GameStates::Loading:
     return &loading_;
   case GameStates::Splash:
