@@ -9,4 +9,3 @@ This project is used to test the capabilities of JetBrains' AI assistant.
 
  * Fonts & UI Pack - [kenney.nl](https://kenney.nl/) - [CC0 (Creative Commons Zero)](http://creativecommons.org/publicdomain/zero/1.0/)
  * SDL2 - [libsdl.org](https://www.libsdl.org/index.php) - [zlib License](https://www.zlib.net/zlib_license.html)
- * Boost - [boost.org](https://www.boost.org/) - [Boost Software License](https://www.boost.org/users/license.html)
