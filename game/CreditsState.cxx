@@ -6,7 +6,7 @@
 
 CreditsState::CreditsState()
     :font_{"kenney_pixel.ttf"}, jetbrains_ai_logo_{"jetbrains-ai-logo.png"}, kenney_logo_{"kenney-logo.png"},
-     sdl_logo_{"SDL_logo.png"}, boost_logo_{"Boost-logo.png"}
+     sdl_logo_{"SDL_logo.png"}
 {
 }
 
@@ -21,7 +21,6 @@ void CreditsState::on_enter(GameStateManager& gsm)
       External{jetbrains_ai_logo_, "with some help from JetBrains AI Assistant"},
       External{kenney_logo_, "Font & UI Pack from kenney.nl"},
       sdl_logo_,
-      boost_logo_,
   };
 
   int summed_size = -ITEM_PADDING;

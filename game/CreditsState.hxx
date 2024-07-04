@@ -36,7 +36,6 @@ private:
   Asset<SDL_Texture*> jetbrains_ai_logo_;
   Asset<SDL_Texture*> kenney_logo_;
   Asset<SDL_Texture*> sdl_logo_;
-  Asset<SDL_Texture*> boost_logo_;
 
   std::vector<std::variant<char const*, External, SDL_Texture*>> scroll_items_{};
 
