@@ -11,12 +11,12 @@
 
 class LineInput final : private NonCopyable {
 public:
-  static int constexpr MIN_WIDTH = 16;
-  static int constexpr MIN_HEIGHT = 15;
+  static float constexpr MIN_WIDTH = 16;
+  static float constexpr MIN_HEIGHT = 15;
 
   static int constexpr MAX_CHARACTERS = 40;
 
-  LineInput(int x, int y, int w, int h, std::string value = "");
+  LineInput(float x, float y, float w, float h, std::string value = "");
 
   void on_event(SDL_Event const& evt);
 
@@ -28,7 +28,7 @@ public:
 
   void resize(int w, int h);
 
-  [[nodiscard]] SDL_Rect get_bounding_box() const;
+  [[nodiscard]] SDL_FRect get_bounding_box() const;
 
   // this does not remove the focus from other inputs!
   void set_focus(bool focus);
@@ -43,9 +43,11 @@ public:
 
   [[nodiscard]]char const* value() const;
 
+  void set_current_window(SDL_Window* window);
+
 private:
   std::string value_;
-  int x_, y_, w_, h_;
+  float x_, y_, w_, h_;
   bool focus_;
   bool visible_;
 
@@ -53,6 +55,7 @@ private:
   Asset<TTF_Font*> font_;
 
   std::chrono::milliseconds blink_timer_{0};
+  SDL_Window* window_{nullptr};
 };
 
 #endif // SNAKE_LINEINPUT_HXX

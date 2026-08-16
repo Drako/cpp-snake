@@ -36,7 +36,7 @@ private:
 
   void handle_controller_button_down(std::uint8_t button);
 
-  void handle_mouse_movement(int x, int y);
+  void handle_mouse_movement(float x, float y);
 
   void handle_controller_axis_motion(std::uint8_t axis, std::int16_t value);
 

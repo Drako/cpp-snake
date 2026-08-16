@@ -55,11 +55,11 @@ private:
 
   bool place_target();
 
-  void render_ui(SDLRenderer& renderer, SDL_Rect const& playing_field);
+  void render_ui(SDLRenderer& renderer, SDL_FRect const& playing_field);
 
-  void render_target(SDLRenderer& renderer, SDL_Rect const& playing_field);
+  void render_target(SDLRenderer& renderer, SDL_FRect const& playing_field);
 
-  void render_snake(SDLRenderer& renderer, SDL_Rect const& playing_field);
+  void render_snake(SDLRenderer& renderer, SDL_FRect const& playing_field);
 
   bool detect_death(SDL_Point const& position);
 

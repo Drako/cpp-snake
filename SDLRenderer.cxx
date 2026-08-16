@@ -2,15 +2,14 @@
 
 SDLRenderer::SDLRenderer(SDLWindow& window)
 {
-  renderer_ = SDL_CreateRenderer(window, 0, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+  renderer_ = SDL_CreateRenderer(window, nullptr);
   if (renderer_==nullptr) {
     throw SDLError("Failed to create renderer.");
   }
+  SDL_SetRenderVSync(renderer_, true);
   SDL_SetRenderDrawBlendMode(renderer_, SDL_BLENDMODE_BLEND);
 
-  SDL_RendererInfo info{};
-  SDL_GetRendererInfo(renderer_, &info);
-  SDL_Log("Created renderer (%s) successfully.", info.name);
+  SDL_Log("Created renderer (%s) successfully.", SDL_GetRendererName(renderer_));
 }
 
 SDLRenderer::~SDLRenderer() noexcept

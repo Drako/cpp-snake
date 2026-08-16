@@ -11,7 +11,7 @@
 #include <thread>
 #include <unordered_map>
 
-#include <SDL_ttf.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 #include "../NonCopyable.hxx"
 

@@ -2,10 +2,10 @@
 
 #include <algorithm>
 
-SDLWindow::SDLWindow(std::string_view title, int x, int y, int w, int h, std::uint32_t flags)
+SDLWindow::SDLWindow(std::string_view title, int w, int h, std::uint32_t flags)
 {
   SDL::require(SDL_INIT_VIDEO);
-  window_ = SDL_CreateWindow(title.data(), x, y, w, h, flags);
+  window_ = SDL_CreateWindow(title.data(), w, h, flags);
   if (window_==nullptr) {
     throw SDLError("Failed to create window.");
   }

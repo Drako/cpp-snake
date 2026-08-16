@@ -3,8 +3,8 @@
 #ifndef SNAKE_BUTTON_HXX
 #define SNAKE_BUTTON_HXX
 
-#include <SDL.h>
-#include <SDL_ttf.h>
+#include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 #include <functional>
 #include <string>
@@ -16,10 +16,10 @@
 
 class Button final : private NonCopyable {
 public:
-  static int constexpr MIN_WIDTH = 12;
-  static int constexpr MIN_HEIGHT = 14;
+  static float constexpr MIN_WIDTH = 12;
+  static float constexpr MIN_HEIGHT = 14;
 
-  Button(int x, int y, int w, int h, UiColor color = UiColor::Grey);
+  Button(float x, float y, float w, float h, UiColor color = UiColor::Grey);
 
   void set_title(std::string const& title);
 
@@ -45,11 +45,11 @@ public:
 
   void resize(int w, int h);
 
-  [[nodiscard]] SDL_Rect get_bounding_box() const;
+  [[nodiscard]] SDL_FRect get_bounding_box() const;
 
 private:
   std::string title_{};
-  int x_, y_, w_, h_;
+  float x_, y_, w_, h_;
   bool pressed_;
   bool visible_;
   std::function<void()> on_click_;

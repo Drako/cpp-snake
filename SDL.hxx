@@ -3,12 +3,13 @@
 #ifndef SNAKE_SDL_HXX
 #define SNAKE_SDL_HXX
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include <cstdint>
 #include <source_location>
 #include <stdexcept>
 #include <string_view>
+#include <unordered_map>
 #include <vector>
 
 #include "NonCopyable.hxx"
@@ -38,7 +39,7 @@ public:
  */
 class SDL final : private NonCopyable {
 public:
-  explicit SDL(std::uint32_t flags = SDL_INIT_EVERYTHING);
+  explicit SDL(std::uint32_t flags = SDL_INIT_GAMEPAD|SDL_INIT_VIDEO|SDL_INIT_EVENTS);
 
   ~SDL() noexcept;
 
@@ -46,16 +47,16 @@ public:
 
   static SDL& require(std::uint32_t flags) noexcept;
 
-  void add_controller(int which);
+  void add_controller(SDL_JoystickID which);
 
-  void remove_controller(int which);
+  void remove_controller(SDL_JoystickID which);
 
-  std::vector<SDL_GameController *> const& get_controllers() const;
+  [[nodiscard]] std::unordered_map<SDL_JoystickID, SDL_Gamepad*> const& get_controllers() const;
 
 private:
   static SDL* instance_;
 
-  std::vector<SDL_GameController*> controllers_;
+  std::unordered_map<SDL_JoystickID, SDL_Gamepad*> controllers_;
 };
 
 #endif // SNAKE_SDL_HXX

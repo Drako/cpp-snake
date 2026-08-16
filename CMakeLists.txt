@@ -11,24 +11,24 @@ include(ProjectHelpers)
 
 include(FetchContent)
 FetchContent_Declare(
-    SDL2
+    SDL3
     GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
-    GIT_TAG 15ead9a40d09a1eb9972215cceac2bf29c9b77f6 # release-2.28.5
+    GIT_TAG 147a8ee32dbf9ac02f3794964490687b6bbda1bc # release-3.4.14
     FIND_PACKAGE_ARGS
 )
 FetchContent_Declare(
-    SDL2_image
+    SDL3_image
     GIT_REPOSITORY https://github.com/libsdl-org/SDL_image.git
-    GIT_TAG 28b9daa15a59aa2829cd29944ca9ffbf049d7667 # release-2.8.1
+    GIT_TAG bec9134a26c7d0f31b36d6083c25296e04cabff5 # release-3.4.4
     FIND_PACKAGE_ARGS
 )
 FetchContent_Declare(
-    SDL2_ttf
+    SDL3_ttf
     GIT_REPOSITORY https://github.com/libsdl-org/SDL_ttf.git
-    GIT_TAG 89d1692fd8fe91a679bb943d377bfbd709b52c23 # release-2.20.2
+    GIT_TAG a1ce3670aec736ecbf0936c43f2f0cc53aa61e5b # release-3.2.2
     FIND_PACKAGE_ARGS
 )
-FetchContent_MakeAvailable(SDL2 SDL2_image SDL2_ttf)
+FetchContent_MakeAvailable(SDL3 SDL3_image SDL3_ttf)
 
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/Config.hxx.in"
@@ -73,18 +73,18 @@ if ((NOT WIN32) AND (NOT APPLE))
   )
 endif ()
 target_link_libraries(Snake PRIVATE
-    SDL2::SDL2 SDL2::SDL2main
-    SDL2_image::SDL2_image
-    SDL2_ttf::SDL2_ttf
+    SDL3::SDL3-shared
+    SDL3_image::SDL3_image
+    SDL3_ttf::SDL3_ttf
 )
 
 if (WIN32)
-  copy_dependency_dll(TARGET Snake DEPENDENCY SDL2::SDL2)
-  copy_dependency_dll(TARGET Snake DEPENDENCY SDL2_image::SDL2_image)
-  copy_dependency_dll(TARGET Snake DEPENDENCY SDL2_ttf::SDL2_ttf)
+  #copy_dependency_dll(TARGET Snake DEPENDENCY SDL3-shared)
+  #copy_dependency_dll(TARGET Snake DEPENDENCY SDL3_image::SDL3_image)
+  #copy_dependency_dll(TARGET Snake DEPENDENCY SDL3_ttf::SDL3_ttf)
 
   include(InstallRequiredSystemLibraries)
-  install(IMPORTED_RUNTIME_ARTIFACTS SDL2::SDL2 SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf)
+  #install(IMPORTED_RUNTIME_ARTIFACTS SDL3-shared SDL3_image::SDL3_image SDL3_ttf::SDL3_ttf)
 
   install(TARGETS Snake DESTINATION bin)
   install(FILES ${assets} DESTINATION assets)
@@ -110,8 +110,9 @@ elseif (APPLE)
       XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "YES"
   )
 
-  get_dependency_location(SDL2_directory DEPENDENCY SDL2::SDL2)
-  string(REPLACE "Cellar/sdl2/2.28.5/lib" "lib" dependency_dir "${SDL2_directory}")
+  get_dependency_location(SDL3_directory DEPENDENCY SDL3::SDL3)
+  # TODO: Fix version
+  # string(REPLACE "Cellar/sdl2/2.28.5/lib" "lib" dependency_dir "${SDL3_directory}")
 
   configure_file(
       "${CMAKE_CURRENT_SOURCE_DIR}/FixupBundle.cmake.in"

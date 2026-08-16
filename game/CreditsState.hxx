@@ -39,8 +39,8 @@ private:
 
   std::vector<std::variant<char const*, External, SDL_Texture*>> scroll_items_{};
 
-  double scroll_y_{0.0};
-  double scroll_size_{0.0};
+  float scroll_y_{0.f};
+  float scroll_size_{0.f};
   // this is a hack because we detect being done in render() and use that info in update()
   bool done_{false};
 };

@@ -5,7 +5,7 @@
 
 #include "GameState.hxx"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 class SplashState final : public GameState {
 public:

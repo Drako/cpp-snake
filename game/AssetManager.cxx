@@ -7,7 +7,7 @@
 #include <cassert>
 #include <filesystem>
 
-#include <SDL_image.h>
+#include <SDL3_image/SDL_image.h>
 
 AssetManager* AssetManager::instance_ = nullptr;
 
@@ -52,7 +52,7 @@ AssetManager::~AssetManager()
     loading_thread_.join();
   }
   for (auto const& kv: surface_assets_) {
-    SDL_FreeSurface(kv.second);
+    SDL_DestroySurface(kv.second);
   }
   for (auto const& kv: texture_assets_) {
     SDL_DestroyTexture(kv.second);

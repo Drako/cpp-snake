@@ -7,6 +7,8 @@
 
 #include <cstdlib>
 
+#include <SDL3/SDL_main.h>
+
 void main_loop(SDLWindow& window, SDLRenderer& renderer)
 {
   using namespace std::chrono;
@@ -21,17 +23,17 @@ void main_loop(SDLWindow& window, SDLRenderer& renderer)
       switch (evt.type) {
       default:
         break;
-      case SDL_QUIT:
+      case SDL_EVENT_QUIT:
         return;
-      case SDL_CONTROLLERDEVICEADDED:
+      case SDL_EVENT_GAMEPAD_ADDED:
         SDL::instance().add_controller(evt.cdevice.which);
         break;
-      case SDL_CONTROLLERDEVICEREMOVED:
+      case SDL_EVENT_GAMEPAD_REMOVED:
         SDL::instance().remove_controller(evt.cdevice.which);
         break;
       }
 
-      if (evt.type==SDL_QUIT)
+      if (evt.type==SDL_EVENT_QUIT)
         return;
 
       if (auto const state = gsm.current(); state!=nullptr)
@@ -62,15 +64,15 @@ void main_loop(SDLWindow& window, SDLRenderer& renderer)
   }
 }
 
-int main(int argc, char** argv) try
+int SDL_main(int argc, char** argv) try
 {
   SDL sdl{};
   SDLWindow window{
       "Snake",
-      SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
       0, 0,
-      SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_BORDERLESS
+      SDL_WINDOW_BORDERLESS
   };
+  SDL_SetWindowFullscreen(window, true);
   SDLRenderer renderer{window};
 
   main_loop(window, renderer);

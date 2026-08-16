@@ -26,50 +26,53 @@ void CreditsState::on_enter(GameStateManager& gsm)
   int summed_size = -ITEM_PADDING;
   for (auto const& item: scroll_items_) {
     summed_size += std::visit([font]<typename T>(T const& it) {
-      int w, h = 0;
+      int w, h;
       if constexpr (std::is_same_v<T, char const*>) {
-        TTF_SizeUTF8(font, it, &w, &h);
+        TTF_GetStringSize(font, it, 0, &w, &h);
       }
       else if constexpr (std::is_same_v<T, External>) {
-        int logo_h, text_h;
-        TTF_SizeUTF8(font, it.text_, &w, &text_h);
-        SDL_QueryTexture(it.texture_, nullptr, nullptr, &w, &logo_h);
+        int text_h;
+        float logo_w, logo_h;
+        TTF_GetStringSize(font, it.text_, 0, &w, &text_h);
+        SDL_GetTextureSize(it.texture_, &logo_w, &logo_h);
         h = logo_h+INNER_ITEM_PADDING+text_h;
       }
       else if constexpr (std::is_same_v<T, SDL_Texture*>) {
-        SDL_QueryTexture(it, nullptr, nullptr, &w, &h);
+        float logo_w, logo_h;
+        SDL_GetTextureSize(it, &logo_w, &logo_h);
+        h = static_cast<int>(logo_h);
       }
       return h;
     }, item);
     summed_size += ITEM_PADDING;
   }
-  scroll_size_ = static_cast<double>(summed_size);
+  scroll_size_ = static_cast<float>(summed_size);
 }
 
 void CreditsState::on_event(GameStateManager& gsm, SDL_Event const& event)
 {
-  if (event.type==SDL_KEYUP) {
-    switch (event.key.keysym.scancode) {
+  if (event.type==SDL_EVENT_KEY_UP) {
+    switch (event.key.key) {
     default:
       break;
-    case SDL_SCANCODE_ESCAPE:
+    case SDLK_ESCAPE:
       [[fallthrough]];
-    case SDL_SCANCODE_RETURN:
+    case SDLK_RETURN:
       [[fallthrough]];
-    case SDL_SCANCODE_SPACE:
+    case SDLK_SPACE:
       gsm.pop_state();
       break;
     }
   }
-  else if (event.type==SDL_CONTROLLERBUTTONUP) {
-    switch (event.cbutton.which) {
+  else if (event.type==SDL_EVENT_GAMEPAD_BUTTON_UP) {
+    switch (event.gbutton.button) {
     default:
       break;
-    case SDL_CONTROLLER_BUTTON_A:
+    case SDL_GAMEPAD_BUTTON_SOUTH:
       [[fallthrough]];
-    case SDL_CONTROLLER_BUTTON_B:
+    case SDL_GAMEPAD_BUTTON_WEST:
       [[fallthrough]];
-    case SDL_CONTROLLER_BUTTON_START:
+    case SDL_GAMEPAD_BUTTON_START:
       gsm.pop_state();
       break;
     }
@@ -90,53 +93,52 @@ void CreditsState::render(SDLRenderer& renderer)
   TTF_Font* const font = font_;
 
   int window_width = 0, window_height = 0;
-  SDL_GetRendererOutputSize(renderer, &window_width, &window_height);
+  SDL_GetCurrentRenderOutputSize(renderer, &window_width, &window_height);
 
-  int y = window_height-static_cast<int>(scroll_y_);
-  if (y<=-static_cast<int>(scroll_size_)) {
+  float y = static_cast<float>(window_height)-scroll_y_;
+  if (y<=-scroll_size_) {
     // everything is now outside the screen at the top
     done_ = true;
   }
 
   for (auto const& item: scroll_items_) {
     std::visit([&renderer, &y, window_width, font]<typename T>(T const& it) {
-      int h = 0;
+      float h = 0.f;
+      float w = 0.f;
       if constexpr (std::is_same_v<T, char const*>) {
-        auto const surface = TTF_RenderUTF8_Solid(font, it, {255, 255, 255, SDL_ALPHA_OPAQUE});
+        auto const surface = TTF_RenderText_Solid(font, it, 0, {255, 255, 255, SDL_ALPHA_OPAQUE});
         auto const texture = SDL_CreateTextureFromSurface(renderer, surface);
-        SDL_FreeSurface(surface);
+        SDL_DestroySurface(surface);
 
-        int w;
-        SDL_QueryTexture(texture, nullptr, nullptr, &w, &h);
-        SDL_Rect const rect{.x = (window_width-w)/2, .y = y, .w = w, .h = h};
-        SDL_RenderCopy(renderer, texture, nullptr, &rect);
+        SDL_GetTextureSize(texture, &w, &h);
+        SDL_FRect const rect{.x = (window_width-w)/2, .y = y, .w = w, .h = h};
+        SDL_RenderTexture(renderer, texture, nullptr, &rect);
 
         SDL_DestroyTexture(texture);
       }
       else if constexpr (std::is_same_v<T, External>) {
-        int w, logo_h, text_h;
+        float logo_h, text_h;
 
-        SDL_QueryTexture(it.texture_, nullptr, nullptr, &w, &logo_h);
-        SDL_Rect const logo_rect{.x = (window_width-w)/2, .y = y, .w = w, .h = logo_h};
-        SDL_RenderCopy(renderer, it.texture_, nullptr, &logo_rect);
+        SDL_GetTextureSize(it.texture_, &w, &logo_h);
+        SDL_FRect const logo_rect{.x = (window_width-w)/2, .y = y, .w = w, .h = logo_h};
+        SDL_RenderTexture(renderer, it.texture_, nullptr, &logo_rect);
 
-        auto const surface = TTF_RenderUTF8_Solid(font, it.text_, {255, 255, 255, SDL_ALPHA_OPAQUE});
+        auto const surface = TTF_RenderText_Solid(font, it.text_, 0, {255, 255, 255, SDL_ALPHA_OPAQUE});
         auto const texture = SDL_CreateTextureFromSurface(renderer, surface);
-        SDL_FreeSurface(surface);
+        SDL_DestroySurface(surface);
 
-        SDL_QueryTexture(texture, nullptr, nullptr, &w, &text_h);
-        SDL_Rect const text_rect{.x = (window_width-w)/2, .y = y+logo_h+INNER_ITEM_PADDING, .w = w, .h = text_h};
-        SDL_RenderCopy(renderer, texture, nullptr, &text_rect);
+        SDL_GetTextureSize(texture, &w, &text_h);
+        SDL_FRect const text_rect{.x = (window_width-w)/2, .y = y+logo_h+INNER_ITEM_PADDING, .w = w, .h = text_h};
+        SDL_RenderTexture(renderer, texture, nullptr, &text_rect);
 
         SDL_DestroyTexture(texture);
 
         h = logo_h+INNER_ITEM_PADDING+text_h;
       }
       else if constexpr (std::is_same_v<T, SDL_Texture*>) {
-        int w;
-        SDL_QueryTexture(it, nullptr, nullptr, &w, &h);
-        SDL_Rect const rect{.x = (window_width-w)/2, .y = y, .w = w, .h = h};
-        SDL_RenderCopy(renderer, it, nullptr, &rect);
+        SDL_GetTextureSize(it, &w, &h);
+        SDL_FRect const rect{.x = (window_width-w)/2, .y = y, .w = w, .h = h};
+        SDL_RenderTexture(renderer, it, nullptr, &rect);
       }
 
       y += h+ITEM_PADDING;

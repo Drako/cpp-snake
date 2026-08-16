@@ -91,16 +91,16 @@ void PlayingState::on_enter(GameStateManager& gsm)
 
 void PlayingState::on_event(GameStateManager& gsm, SDL_Event const& evt)
 {
-  if (evt.type==SDL_KEYUP) {
-    auto const scancode = evt.key.keysym.scancode;
+  if (evt.type==SDL_EVENT_KEY_UP) {
+    auto const scancode = evt.key.scancode;
     if (scancode==SDL_SCANCODE_ESCAPE || scancode==SDL_SCANCODE_PAUSE)
       gsm.push_state(GameStates::MainMenu);
     else if (scancode==SDL_SCANCODE_F)
       show_fps_ = !show_fps_;
   }
-  else if (evt.type==SDL_CONTROLLERBUTTONUP) {
-    auto const button = evt.cbutton.button;
-    if (button==SDL_CONTROLLER_BUTTON_START)
+  else if (evt.type==SDL_EVENT_GAMEPAD_BUTTON_UP) {
+    auto const button = evt.gbutton.button;
+    if (button==SDL_GAMEPAD_BUTTON_START)
       gsm.push_state(GameStates::MainMenu);
   }
 }
@@ -190,19 +190,19 @@ void PlayingState::handle_direction_change()
   auto const keyboard = SDL_GetKeyboardState(nullptr);
   auto const& controllers = SDL::instance().get_controllers();
   bool controller_up = false, controller_down = false, controller_left = false, controller_right = false;
-  for (auto const controller: controllers) {
+  for (auto const & [_, controller]: controllers) {
     controller_up = controller_up
-        || (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_UP)==1)
-        || (SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY)<-13'000);
+        || (SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_UP)==1)
+        || (SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_LEFTY)<-13'000);
     controller_down = controller_down
-        || (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_DOWN)==1)
-        || (SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY)>13'000);
+        || (SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_DOWN)==1)
+        || (SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_LEFTY)>13'000);
     controller_left = controller_left
-        || (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_LEFT)==1)
-        || (SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX)<-13'000);
+        || (SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_LEFT)==1)
+        || (SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_LEFTX)<-13'000);
     controller_right = controller_right
-        || (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT)==1)
-        || (SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX)>13'000);
+        || (SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_RIGHT)==1)
+        || (SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_LEFTX)>13'000);
   }
 
   if (direction_==Direction::Left || direction_==Direction::Right) {
@@ -225,28 +225,28 @@ void PlayingState::handle_direction_change()
   }
 }
 
-void PlayingState::render_ui(SDLRenderer& renderer, SDL_Rect const& playing_field)
+void PlayingState::render_ui(SDLRenderer& renderer, SDL_FRect const& playing_field)
 {
   auto const& tm = TranslationManager::instance();
 
   auto const score_text = tm.get_translation("Score")+": "+std::to_string(length_);
-  SDL_Surface* text_surface = TTF_RenderUTF8_Solid(font_, score_text.c_str(), {255, 255, 255, SDL_ALPHA_OPAQUE});
+  SDL_Surface* text_surface = TTF_RenderText_Solid(font_, score_text.c_str(), score_text.length(), {255, 255, 255, SDL_ALPHA_OPAQUE});
   SDL_Texture* text = SDL_CreateTextureFromSurface(renderer, text_surface);
-  SDL_FreeSurface(text_surface);
-  int text_width, text_height;
-  SDL_QueryTexture(text, nullptr, nullptr, &text_width, &text_height);
-  SDL_Rect render_quad = {playing_field.x, 10, text_width, text_height};
-  SDL_RenderCopy(renderer, text, nullptr, &render_quad);
+  SDL_DestroySurface(text_surface);
+  float text_width, text_height;
+  SDL_GetTextureSize(text, &text_width, &text_height);
+  SDL_FRect render_quad = {playing_field.x, 10.f, text_width, text_height};
+  SDL_RenderTexture(renderer, text, nullptr, &render_quad);
   SDL_DestroyTexture(text);
 
   if (show_fps_) {
     auto const fps_text = tm.get_translation("Frames per second")+": "+std::to_string(fps_);
-    text_surface = TTF_RenderUTF8_Solid(font_, fps_text.c_str(), {255, 255, 255, SDL_ALPHA_OPAQUE});
+    text_surface = TTF_RenderText_Solid(font_, fps_text.c_str(), fps_text.length(), {255, 255, 255, SDL_ALPHA_OPAQUE});
     text = SDL_CreateTextureFromSurface(renderer, text_surface);
-    SDL_FreeSurface(text_surface);
-    SDL_QueryTexture(text, nullptr, nullptr, &text_width, &text_height);
+    SDL_DestroySurface(text_surface);
+    SDL_GetTextureSize(text, &text_width, &text_height);
     render_quad = {playing_field.x+playing_field.w-text_width, 10, text_width, text_height};
-    SDL_RenderCopy(renderer, text, nullptr, &render_quad);
+    SDL_RenderTexture(renderer, text, nullptr, &render_quad);
     SDL_DestroyTexture(text);
   }
 
@@ -254,7 +254,7 @@ void PlayingState::render_ui(SDLRenderer& renderer, SDL_Rect const& playing_fiel
     SDL_SetRenderDrawColor(renderer, 249, 95, 0, SDL_ALPHA_OPAQUE);
   else
     SDL_SetRenderDrawColor(renderer, 255, 204, 0, SDL_ALPHA_OPAQUE);
-  SDL_RenderDrawRect(renderer, &playing_field);
+  SDL_RenderRect(renderer, &playing_field);
 }
 
 bool PlayingState::place_target()
@@ -293,19 +293,19 @@ void PlayingState::place_head()
   head_.y = static_cast<float>(distribution_position_y_(generator_));
 }
 
-void PlayingState::render_target(SDLRenderer& renderer, SDL_Rect const& playing_field)
+void PlayingState::render_target(SDLRenderer& renderer, SDL_FRect const& playing_field)
 {
   auto const ratio = playing_field.w/static_cast<double>(CELLS_X);
 
-  std::vector<SDL_Rect> target_rects;
+  std::vector<SDL_FRect> target_rects;
   target_rects.reserve(target_.size());
   std::ranges::transform(target_, std::back_insert_iterator{target_rects},
       [ratio, playing_field](SDL_Point const& target) {
-        return SDL_Rect{
-            .x = static_cast<int>(playing_field.x+ratio*target.x),
-            .y = static_cast<int>(playing_field.y+ratio*target.y),
-            .w = static_cast<int>(ratio),
-            .h = static_cast<int>(ratio),
+        return SDL_FRect{
+            .x = static_cast<float>(playing_field.x+ratio*target.x),
+            .y = static_cast<float>(playing_field.y+ratio*target.y),
+            .w = static_cast<float>(ratio),
+            .h = static_cast<float>(ratio),
         };
       });
 
@@ -313,20 +313,20 @@ void PlayingState::render_target(SDLRenderer& renderer, SDL_Rect const& playing_
   SDL_RenderFillRects(renderer, target_rects.data(), static_cast<int>(target_rects.size()));
 }
 
-void PlayingState::render_snake(SDLRenderer& renderer, SDL_Rect const& playing_field)
+void PlayingState::render_snake(SDLRenderer& renderer, SDL_FRect const& playing_field)
 {
   auto const ratio = playing_field.w/static_cast<double>(CELLS_X);
   double const decay = 1.0/static_cast<double>(tail_.size()+1);
 
   auto calculate_rect = [ratio, playing_field, decay, size_factor = 1.0](SDL_Point const& position) mutable {
-    int const base_x = static_cast<int>(playing_field.x+ratio*position.x);
-    int const base_y = static_cast<int>(playing_field.y+ratio*position.y);
-    int const size = std::max(1, static_cast<int>(ratio*size_factor));
-    int const padding = (static_cast<int>(ratio)-size) >> 1;
+    float const base_x = static_cast<float>(playing_field.x+ratio*position.x);
+    float const base_y = static_cast<float>(playing_field.y+ratio*position.y);
+    float const size = std::max(1.f, static_cast<float>(ratio*size_factor));
+    float const padding = (static_cast<float>(ratio)-size)/ 2.f;
 
     size_factor = std::max(0.0, size_factor-decay);
 
-    return SDL_Rect{
+    return SDL_FRect{
         .x = base_x+padding,
         .y = base_y+padding,
         .w = size,
@@ -338,7 +338,7 @@ void PlayingState::render_snake(SDLRenderer& renderer, SDL_Rect const& playing_f
   auto const head_rect = calculate_rect(::head_position(head_));
   SDL_RenderFillRect(renderer, &head_rect);
 
-  std::vector<SDL_Rect> rects;
+  std::vector<SDL_FRect> rects;
   rects.reserve(tail_.size());
   std::ranges::transform(tail_, std::back_insert_iterator{rects}, calculate_rect);
   SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
@@ -360,9 +360,9 @@ bool PlayingState::detect_death(SDL_Point const& position)
 void PlayingState::render(SDLRenderer& renderer)
 {
   int width, height;
-  SDL_GetRendererOutputSize(renderer, &width, &height);
+  SDL_GetCurrentRenderOutputSize(renderer, &width, &height);
 
-  SDL_Rect playing_field;
+  SDL_FRect playing_field;
   double const ratio = static_cast<double>(CELLS_X)/CELLS_Y;
 
   if (width<height*ratio) {

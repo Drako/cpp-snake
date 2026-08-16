@@ -54,7 +54,7 @@ void MenuState::on_enter(GameStateManager& gsm)
     }
   });
 
-  SDL_ShowCursor(SDL_ENABLE);
+  SDL_ShowCursor();
 }
 
 void MenuState::on_event(GameStateManager& gsm, SDL_Event const& evt)
@@ -62,22 +62,22 @@ void MenuState::on_event(GameStateManager& gsm, SDL_Event const& evt)
   switch (evt.type) {
   default:
     break;
-  case SDL_KEYUP:
-    handle_key_up(gsm, evt.key.keysym.scancode);
+  case SDL_EVENT_KEY_UP:
+    handle_key_up(gsm, evt.key.scancode);
     break;
-  case SDL_KEYDOWN:
-    handle_key_down(evt.key.keysym.scancode);
+  case SDL_EVENT_KEY_DOWN:
+    handle_key_down(evt.key.scancode);
     break;
-  case SDL_CONTROLLERBUTTONUP:
-    handle_controller_button_up(gsm, evt.cbutton.button);
+  case SDL_EVENT_GAMEPAD_BUTTON_UP:
+    handle_controller_button_up(gsm, evt.gbutton.button);
     break;
-  case SDL_CONTROLLERBUTTONDOWN:
-    handle_controller_button_down(evt.cbutton.button);
+  case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
+    handle_controller_button_down(evt.gbutton.button);
     break;
-  case SDL_CONTROLLERAXISMOTION:
-    handle_controller_axis_motion(evt.caxis.axis, evt.caxis.value);
+  case SDL_EVENT_GAMEPAD_AXIS_MOTION:
+    handle_controller_axis_motion(evt.gaxis.axis, evt.gaxis.value);
     break;
-  case SDL_MOUSEMOTION:
+  case SDL_EVENT_MOUSE_MOTION:
     handle_mouse_movement(evt.motion.x, evt.motion.y);
     break;
   }
@@ -105,7 +105,7 @@ void MenuState::update(GameStateManager& gsm, std::chrono::milliseconds const de
 void MenuState::render(SDLRenderer& renderer)
 {
   int screen_w, screen_h;
-  SDL_GetRendererOutputSize(renderer, &screen_w, &screen_h);
+  SDL_GetCurrentRenderOutputSize(renderer, &screen_w, &screen_h);
 
   int const button_count = continue_button_.is_visible() ? 5 : 4;
 
@@ -143,12 +143,12 @@ void MenuState::render(SDLRenderer& renderer)
 
 void MenuState::on_leave()
 {
-  SDL_ShowCursor(SDL_DISABLE);
+  SDL_HideCursor();
 }
 
 void MenuState::select_previous_button()
 {
-  SDL_ShowCursor(SDL_DISABLE);
+  SDL_HideCursor();
   --active_button_;
   if (active_button_<0)
     active_button_ = 4;
@@ -158,7 +158,7 @@ void MenuState::select_previous_button()
 
 void MenuState::select_next_button()
 {
-  SDL_ShowCursor(SDL_DISABLE);
+  SDL_HideCursor();
   ++active_button_;
   if (active_button_>4)
     active_button_ = 0;
@@ -221,9 +221,9 @@ void MenuState::trigger_active_button()
   }
 }
 
-void MenuState::handle_mouse_movement(int const x, int const y)
+void MenuState::handle_mouse_movement(float const x, float const y)
 {
-  SDL_ShowCursor(SDL_ENABLE);
+  SDL_ShowCursor();
 
   std::array<Button*, 5> buttons{&new_game_button_, nullptr, &high_score_button_, &credits_button_, &quit_button_};
   if (continue_button_.is_visible())
@@ -246,14 +246,14 @@ void MenuState::handle_controller_button_up(GameStateManager& gsm, std::uint8_t 
   switch (button) {
   default:
     break;
-  case SDL_CONTROLLER_BUTTON_START:
+  case SDL_GAMEPAD_BUTTON_START:
     [[fallthrough]];
-  case SDL_CONTROLLER_BUTTON_B:
+  case SDL_GAMEPAD_BUTTON_WEST:
     if (gsm.parent()==nullptr)
       break;
     gsm.pop_state();
     break;
-  case SDL_CONTROLLER_BUTTON_A:
+  case SDL_GAMEPAD_BUTTON_SOUTH:
     trigger_active_button();
     break;
   }
@@ -264,10 +264,10 @@ void MenuState::handle_controller_button_down(std::uint8_t const button)
   switch (button) {
   default:
     break;
-  case SDL_CONTROLLER_BUTTON_DPAD_UP:
+  case SDL_GAMEPAD_BUTTON_DPAD_UP:
     select_previous_button();
     break;
-  case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+  case SDL_GAMEPAD_BUTTON_DPAD_DOWN:
     select_next_button();
     break;
   }
@@ -275,7 +275,7 @@ void MenuState::handle_controller_button_down(std::uint8_t const button)
 
 void MenuState::handle_controller_axis_motion(std::uint8_t const axis, std::int16_t const value)
 {
-  if (axis!=SDL_CONTROLLER_AXIS_LEFTY)
+  if (axis!=SDL_GAMEPAD_AXIS_LEFTY)
     return;
 
   if (value<-10'000) {

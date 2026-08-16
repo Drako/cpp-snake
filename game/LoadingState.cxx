@@ -12,23 +12,23 @@ void LoadingState::update(GameStateManager& gsm, std::chrono::milliseconds const
 
 void LoadingState::render(SDLRenderer& renderer)
 {
-  static int const BAR_MARGIN = 30;
-  static int const BAR_HEIGHT = 50;
+  static float constexpr BAR_MARGIN = 30.f;
+  static float constexpr BAR_HEIGHT = 50.f;
 
   int w, h;
-  SDL_GetRendererOutputSize(renderer, &w, &h);
+  SDL_GetCurrentRenderOutputSize(renderer, &w, &h);
   float progress = AssetManager::instance().get_progress();
 
-  SDL_Rect const outer_rect = {
+  SDL_FRect const outer_rect = {
       .x=BAR_MARGIN,
-      .y=h-BAR_MARGIN-BAR_HEIGHT,
-      .w=w-(BAR_MARGIN*2),
+      .y=static_cast<float>(h)-BAR_MARGIN-BAR_HEIGHT,
+      .w=static_cast<float>(w)-(BAR_MARGIN*2),
       .h=BAR_HEIGHT
   };
   SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
   SDL_RenderFillRect(renderer, &outer_rect);
 
-  SDL_Rect const inner_rect = {
+  SDL_FRect const inner_rect = {
       .x=BAR_MARGIN+2,
       .y=h-BAR_MARGIN-BAR_HEIGHT+2,
       .w=w-(BAR_MARGIN*2)-4,
@@ -37,10 +37,10 @@ void LoadingState::render(SDLRenderer& renderer)
   SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
   SDL_RenderFillRect(renderer, &inner_rect);
 
-  SDL_Rect const progress_rect = {
+  SDL_FRect const progress_rect = {
       .x=BAR_MARGIN+4,
       .y=h-BAR_MARGIN-BAR_HEIGHT+4,
-      .w=static_cast<int>(std::lerp(0, w-(BAR_MARGIN*2)-8, progress)),
+      .w=std::lerp(0.f, w-(BAR_MARGIN*2)-8, progress),
       .h=BAR_HEIGHT-8
   };
   SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
@@ -49,5 +49,5 @@ void LoadingState::render(SDLRenderer& renderer)
 
 void LoadingState::on_enter(GameStateManager& gsm)
 {
-  SDL_ShowCursor(SDL_DISABLE);
+  SDL_HideCursor();
 }

@@ -5,7 +5,7 @@
 #include <cassert>
 
 namespace {
-  SDL_Rect const TEXTURE_RECTS_UP[] = {
+  SDL_FRect const TEXTURE_RECTS_UP[] = {
       {.x = 0, .y = 0, .w = 6, .h = 5}, // UPPER_LEFT
       {.x = 6, .y = 0, .w = 37, .h = 5}, // UPPER_EDGE
       {.x = 43, .y = 0, .w = 6, .h = 5}, // UPPER_RIGHT
@@ -17,7 +17,7 @@ namespace {
       {.x = 43, .y = 40, .w = 6, .h = 9}, // LOWER_RIGHT
   };
 
-  SDL_Rect const TEXTURE_RECTS_DOWN[] = {
+  SDL_FRect const TEXTURE_RECTS_DOWN[] = {
       {.x = 0, .y = 0, .w = 6, .h = 5}, // UPPER_LEFT
       {.x = 6, .y = 0, .w = 37, .h = 5}, // UPPER_EDGE
       {.x = 43, .y = 0, .w = 6, .h = 5}, // UPPER_RIGHT
@@ -29,22 +29,22 @@ namespace {
       {.x = 43, .y = 40, .w = 6, .h = 5}, // LOWER_RIGHT
   };
 
-  SDL_Rect calculate_text_rect(SDL_Rect const& area, SDL_Texture* texture)
+  SDL_FRect calculate_text_rect(SDL_FRect const& area, SDL_Texture* texture)
   {
-    int text_w, text_h;
-    SDL_QueryTexture(texture, nullptr, nullptr, &text_w, &text_h);
+    float text_w, text_h;
+    SDL_GetTextureSize(texture, &text_w, &text_h);
 
-    float const text_aspect = static_cast<float>(text_w)/static_cast<float>(text_h);
+    float const text_aspect = text_w/text_h;
     float const area_aspect = static_cast<float>(area.w)/static_cast<float>(area.h);
 
-    int put_w, put_h;
+    float put_w, put_h;
     if (text_aspect>area_aspect) {
       put_w = area.w;
-      put_h = static_cast<int>(static_cast<float>(put_w)/text_aspect);
+      put_h = put_w/text_aspect;
     }
     else {
       put_h = area.h;
-      put_w = static_cast<int>(static_cast<float>(put_h)*text_aspect);
+      put_w = put_h*text_aspect;
     }
 
     return {
@@ -56,7 +56,7 @@ namespace {
   }
 }
 
-Button::Button(int const x, int const y, int const w, int const h, UiColor const color)
+Button::Button(float const x, float const y, float const w, float const h, UiColor const color)
     :x_{x}, y_{y}, w_{w}, h_{h}, pressed_{false},
      visible_{true},
      up_{ui_image("button_up", color)},
@@ -94,13 +94,13 @@ void Button::render(SDLRenderer& renderer)
   if (!visible_)
     return;
 
-  auto const text = TTF_RenderUTF8_Solid(font_, title_.c_str(), {0, 0, 0, SDL_ALPHA_OPAQUE});
+  auto const text = TTF_RenderText_Solid(font_, title_.c_str(), title_.length(), {0, 0, 0, SDL_ALPHA_OPAQUE});
   auto const text_ure = SDL_CreateTextureFromSurface(renderer, text);
-  SDL_FreeSurface(text);
+  SDL_DestroySurface(text);
 
   SDL_Texture* texture;
-  SDL_Rect const* texture_rects;
-  SDL_Rect target_rects[9];
+  SDL_FRect const* texture_rects;
+  SDL_FRect target_rects[9];
   if (pressed_) {
     texture = down_;
     texture_rects = ::TEXTURE_RECTS_DOWN;
@@ -131,10 +131,10 @@ void Button::render(SDLRenderer& renderer)
   }
 
   for (int n = 0; n<9; ++n)
-    SDL_RenderCopy(renderer, texture, texture_rects+n, target_rects+n);
+    SDL_RenderTexture(renderer, texture, texture_rects+n, target_rects+n);
 
-  SDL_Rect const text_rect = ::calculate_text_rect(target_rects[4], text_ure);
-  SDL_RenderCopy(renderer, text_ure, nullptr, &text_rect);
+  SDL_FRect const text_rect = ::calculate_text_rect(target_rects[4], text_ure);
+  SDL_RenderTexture(renderer, text_ure, nullptr, &text_rect);
 
   SDL_DestroyTexture(text_ure);
 }
@@ -144,11 +144,11 @@ void Button::update()
   if (!visible_)
     return;
 
-  int mouse_x, mouse_y;
+  float mouse_x, mouse_y;
   auto const mouse_button = SDL_GetMouseState(&mouse_x, &mouse_y);
 
   if ((mouse_x>=x_ && mouse_x<=(x_+w_) && mouse_y>=y_ && mouse_y<=(y_+h_))) {
-    if (mouse_button & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+    if (mouse_button & SDL_BUTTON_MASK(SDL_BUTTON_LEFT)) {
       pressed_ = true;
     }
     else {
@@ -188,7 +188,7 @@ void Button::resize(int const w, int const h)
   h_ = h;
 }
 
-SDL_Rect Button::get_bounding_box() const
+SDL_FRect Button::get_bounding_box() const
 {
   return {x_, y_, w_, h_};
 }

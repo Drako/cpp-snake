@@ -4,8 +4,8 @@
 #include <cassert>
 #include <sstream>
 
-#include <SDL_image.h>
-#include <SDL_ttf.h>
+#include <SDL3_image/SDL_image.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 namespace {
   std::string build_error_message(std::string_view const message, std::source_location const location)
@@ -28,25 +28,20 @@ SDL* SDL::instance_ = nullptr;
 SDL::SDL(std::uint32_t const flags)
 {
   assert(instance_==nullptr);
-  if (SDL_Init(flags)!=0) {
+  if (!SDL_Init(flags)) {
     throw SDLError{"Failed to initialize SDL."};
   }
   SDL_Log("Initialized SDL successfully.");
 
-  auto const img_flags = IMG_INIT_PNG | IMG_INIT_JPG;
-  if (IMG_Init(img_flags)!=img_flags) {
-    throw SDLError{"Failed to initialize SDL_image."};
-  }
-  SDL_Log("Initialized SDL_image successfully.");
-
-  if (TTF_Init()!=0) {
+  if (!TTF_Init()) {
     throw SDLError{"Failed to initialize SDL_ttf."};
   }
   SDL_Log("Initialized SDL_ttf successfully.");
 
-  auto const num_joysticks = SDL_NumJoysticks();
-  for (int n = 0; n<num_joysticks; ++n) {
-    add_controller(n);
+  int num_joysticks = 0;
+  SDL_JoystickID* ids = SDL_GetJoysticks(&num_joysticks);
+  for (auto id = ids; id < ids + num_joysticks; ++id) {
+    add_controller(*id);
   }
 
   instance_ = this;
@@ -56,15 +51,14 @@ SDL::~SDL() noexcept
 {
   assert(instance_!=nullptr);
 
-  for (auto const controller: controllers_) {
-    SDL_Log("Closing controller %s.", SDL_GameControllerName(controller));
-    SDL_GameControllerClose(controller);
+  for (auto const& [id, controller]: controllers_) {
+    SDL_Log("Closing controller %s.", SDL_GetGamepadName(controller));
+    SDL_CloseGamepad(controller);
   }
 
   TTF_Quit();
   SDL_Log("Shut down SDL_ttf successfully.");
 
-  IMG_Quit();
   SDL_Log("Shut down SDL_image successfully.");
 
   SDL_Quit();
@@ -80,28 +74,26 @@ SDL& SDL::instance() noexcept
 
 SDL& SDL::require(std::uint32_t const flags) noexcept
 {
-  assert((SDL_WasInit(flags) | SDL_INIT_NOPARACHUTE)==(flags | SDL_INIT_NOPARACHUTE));
+  assert(SDL_WasInit(flags)==flags);
   return instance();
 }
 
-void SDL::add_controller(int const which)
+void SDL::add_controller(SDL_JoystickID const which)
 {
-  controllers_.push_back(SDL_GameControllerOpen(which));
-  SDL_Log("Opened controller %s.", SDL_GameControllerNameForIndex(which));
+  auto const controller = SDL_OpenGamepad(which);
+  controllers_[which] = controller;
+  SDL_Log("Opened controller %s.", SDL_GetGamepadName(controller));
 }
 
-void SDL::remove_controller(int which)
+void SDL::remove_controller(SDL_JoystickID const which)
 {
-  auto const controller = SDL_GameControllerFromInstanceID(which);
-  SDL_Log("Closing controller %s.", SDL_GameControllerName(controller));
-  SDL_GameControllerClose(controller);
-  auto const it = std::find(controllers_.begin(), controllers_.end(), controller);
-  if (it!=controllers_.end()) {
-    controllers_.erase(it);
-  }
+  auto const controller = controllers_[which];
+  SDL_Log("Closing controller %s.", SDL_GetGamepadName(controller));
+  SDL_CloseGamepad(controller);
+  controllers_.erase(which);
 }
 
-std::vector<SDL_GameController*> const& SDL::get_controllers() const
+std::unordered_map<SDL_JoystickID, SDL_Gamepad*> const& SDL::get_controllers() const
 {
   return controllers_;
 }

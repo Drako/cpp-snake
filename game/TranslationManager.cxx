@@ -1,6 +1,6 @@
 #include "TranslationManager.hxx"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include <fstream>
 #include <optional>
@@ -22,9 +22,10 @@ namespace {
 
   SupportedLanguage get_preferred_language()
   {
-    auto const locales = SDL_GetPreferredLocales();
-    for (auto const* locale = locales; locale->language!=nullptr; ++locale) {
-      auto const lang = language_from_string(locale->language);
+    int num_locales = 0;
+    auto const locales = SDL_GetPreferredLocales(&num_locales);
+    for (auto const* locale = locales; locale < locales + num_locales; ++locale) {
+      auto const lang = language_from_string((*locale)->language);
       if (lang.has_value()) {
         SDL_free(locales);
         return lang.value();

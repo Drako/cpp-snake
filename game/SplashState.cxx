@@ -9,28 +9,28 @@ void SplashState::on_event(GameStateManager& gsm, SDL_Event const& evt)
   switch (evt.type) {
   default:
     break;
-  case SDL_KEYUP:
-    switch (evt.key.keysym.scancode) {
+  case SDL_EVENT_KEY_UP:
+    switch (evt.key.key) {
     default:
       break;
-    case SDL_SCANCODE_SPACE:
+    case SDLK_SPACE:
       [[fallthrough]];
-    case SDL_SCANCODE_RETURN:
+    case SDLK_RETURN:
       [[fallthrough]];
-    case SDL_SCANCODE_ESCAPE:
+    case SDLK_ESCAPE:
       gsm.replace_state(GameStates::MainMenu);
       break;
     }
     break;
-  case SDL_CONTROLLERBUTTONUP:
-    switch (evt.cbutton.button) {
+  case SDL_EVENT_GAMEPAD_BUTTON_UP:
+    switch (evt.gbutton.button) {
     default:
       break;
-    case SDL_CONTROLLER_BUTTON_A:
+    case SDL_GAMEPAD_BUTTON_SOUTH:
       [[fallthrough]];
-    case SDL_CONTROLLER_BUTTON_B:
+    case SDL_GAMEPAD_BUTTON_EAST:
       [[fallthrough]];
-    case SDL_CONTROLLER_BUTTON_START:
+    case SDL_GAMEPAD_BUTTON_START:
       gsm.replace_state(GameStates::MainMenu);
       break;
     }
@@ -63,30 +63,30 @@ void SplashState::render(SDLRenderer& renderer)
     }
 
     int screen_w, screen_h;
-    SDL_GetRendererOutputSize(renderer, &screen_w, &screen_h);
-    int logo_w, logo_h;
-    SDL_QueryTexture(logo_, nullptr, nullptr, &logo_w, &logo_h);
+    SDL_GetCurrentRenderOutputSize(renderer, &screen_w, &screen_h);
+    float logo_w, logo_h;
+    SDL_GetTextureSize(logo_, &logo_w, &logo_h);
 
-    float const logo_aspect = static_cast<float>(logo_w)/static_cast<float>(logo_h);
+    float const logo_aspect = logo_w/logo_h;
     float const screen_aspect = static_cast<float>(screen_w-20)/static_cast<float>(screen_h-20);
 
-    int put_w, put_h;
+    float put_w, put_h;
     if (logo_aspect>screen_aspect) {
-      put_w = (screen_w-20);
-      put_h = static_cast<int>(static_cast<float>(put_w)/logo_aspect);
+      put_w = screen_w-20.f;
+      put_h = put_w/logo_aspect;
     }
     else {
-      put_h = screen_h-20;
-      put_w = static_cast<int>(static_cast<float>(put_h)*logo_aspect);
+      put_h = screen_h-20.f;
+      put_w = put_h*logo_aspect;
     }
 
-    SDL_Rect const logo_rect = {
-        .x = (screen_w-put_w)/2,
-        .y = (screen_h-put_h)/2,
+    SDL_FRect const logo_rect = {
+        .x = (screen_w-put_w)/2.f,
+        .y = (screen_h-put_h)/2.f,
         .w = put_w,
         .h = put_h
     };
-    SDL_RenderCopy(renderer, logo_, nullptr, &logo_rect);
+    SDL_RenderTexture(renderer, logo_, nullptr, &logo_rect);
   }
 }
 
